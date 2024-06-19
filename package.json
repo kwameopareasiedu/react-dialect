@@ -7,6 +7,10 @@
   "homepage": "https://github.com/kwameopareasiedu/react-dialect#readme",
   "license": "MIT",
   "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "dev": "rollup --config --watch"
+  },
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.7",

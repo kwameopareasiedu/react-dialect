@@ -7,8 +7,8 @@ const configs = [
   {
     input: "src/react/index.ts",
     output: {
-      file: "dist/lib.js",
-      format: "module",
+      file: "dist/index.js",
+      format: "esm",
     },
     plugins: [nodeResolve(), typescript(), babel({ babelHelpers: "bundled" })],
     external: ["react", "react/jsx-runtime"],
