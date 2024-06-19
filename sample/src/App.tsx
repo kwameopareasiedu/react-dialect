@@ -26,7 +26,10 @@ function App() {
       </div>
       <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
       <Translate as="div" href="hello">
-        Hello
+        Hello{" "}
+        <span>
+          World <span>Another span</span>
+        </span>
       </Translate>
     </>
   );

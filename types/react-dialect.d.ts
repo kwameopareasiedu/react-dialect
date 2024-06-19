@@ -1,0 +1,3 @@
+interface DialectConfig {
+  root: string;
+}
