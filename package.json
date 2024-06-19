@@ -1,17 +1,32 @@
 {
   "name": "react-dialect",
   "version": "0.1.0",
-  "description": "A next-gen translation library for React",
-  "main": "dist/index.js",
   "author": "Kwame Opare Asiedu",
+  "description": "A next-gen translation library for React",
+  "repository": "https://github.com/kwameopareasiedu/react-dialect",
+  "homepage": "https://github.com/kwameopareasiedu/react-dialect#readme",
   "license": "MIT",
+  "main": "dist/index.js",
   "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "@babel/preset-react": "^7.24.7",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@types/react": "^18.3.3",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
-    "eslint": "^9.5.0",
+    "eslint": "8.57.0",
     "eslint-plugin-react": "^7.34.3",
     "prettier": "3.3.2",
+    "react": "^18.3.1",
+    "rollup": "^4.18.0",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "tslib": "^2.6.3",
     "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
   },
   "engines": {
     "node": "^20.11.1"

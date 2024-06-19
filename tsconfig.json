@@ -5,7 +5,9 @@
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
     "skipLibCheck": true,
+    "jsx": "react-jsx",
     "typeRoots": ["./types"]
   },
   "include": ["./src"],
