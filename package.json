@@ -1,6 +1,7 @@
 {
   "name": "react-dialect",
   "version": "0.1.0",
+  "description": "A next-gen translation library for React",
   "main": "dist/index.js",
   "author": "Kwame Opare Asiedu",
   "license": "MIT",
@@ -11,5 +12,8 @@
     "eslint-plugin-react": "^7.34.3",
     "prettier": "3.3.2",
     "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": "^20.11.1"
   }
 }
