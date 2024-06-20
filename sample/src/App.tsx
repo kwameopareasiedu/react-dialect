@@ -1,7 +1,7 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
-import { Translate } from "react-dialect";
+import { Translate as Trans } from "react-dialect";
 import "./App.css";
 
 function App() {
@@ -25,7 +25,8 @@ function App() {
         </p>
       </div>
       <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-      <Translate>Next gen translation library</Translate>
+      <Trans>Next gen translation library</Trans>
+      <Trans>The count is {count}</Trans>
     </>
   );
 }
