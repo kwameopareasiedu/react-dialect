@@ -1,3 +1,3 @@
 interface DialectConfig {
-  root: string;
+  roots: string[];
 }
