@@ -2,7 +2,6 @@ interface DialectConfig {
   content: string[];
   languages: string[];
   baseLanguage: string;
-  outDir: string;
 }
 
 interface TranslationEntry {

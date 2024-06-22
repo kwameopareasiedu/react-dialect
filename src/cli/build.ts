@@ -32,8 +32,6 @@ function parseConfigFile(): DialectConfig {
   if (!config.baseLanguage) throw `missing required "baseLanguage" field in "${configFileName}"`;
   if (!config.languages.includes(config.baseLanguage)) throw `"baseLanguage" must be included in "languages" array`;
 
-  if (!config.outDir) throw `missing required "outDir" field in "${configFileName}"`;
-
   return config;
 }
 
@@ -42,7 +40,6 @@ function processDirectory(relativePath: string, config: DialectConfig): Translat
   const dirPath = path.resolve(cwd, relativePath);
   if (!fs.existsSync(dirPath)) throw `"${dirPath}" does not exist`;
   if (!fs.lstatSync(dirPath).isDirectory()) throw `"${dirPath}" is not a directory`;
-  if (!path.relative(relativePath, config.outDir)) return []; // Skip processing of "outDir" directory
 
   const dirents = fs.readdirSync(dirPath, { withFileTypes: true });
   const dirDirents = dirents.filter((d) => d.isDirectory());
@@ -122,16 +119,13 @@ function tokenizeString(translationStr: string) {
 function saveTranslationEntries(entries: TranslationEntry[], config: DialectConfig) {
   const cwd = process.cwd();
   const keyDelimiter = "____";
-  const outDirAbsolutePath = path.resolve(cwd, config.outDir);
-  if (!fs.existsSync(outDirAbsolutePath)) fs.mkdirSync(outDirAbsolutePath);
-
-  const translationsDirAbsolutePath = path.resolve(outDirAbsolutePath, "translations");
-  if (!fs.existsSync(translationsDirAbsolutePath)) fs.mkdirSync(translationsDirAbsolutePath);
+  const localesDirPath = path.resolve(cwd, "public", "locales");
+  if (!fs.existsSync(localesDirPath)) fs.mkdirSync(localesDirPath, { recursive: true });
 
   const targetLanguages = config.languages.filter((lang) => lang !== config.baseLanguage);
 
   for (const language of targetLanguages) {
-    const languageTranslationsFilePath = path.resolve(translationsDirAbsolutePath, `${language}.json`);
+    const languageTranslationsFilePath = path.resolve(localesDirPath, `${language}.json`);
 
     const languageTranslationsMap = entries.reduce((map, entry) => {
       const entryKey = entry.key.join(keyDelimiter);
