@@ -83,6 +83,8 @@ function processFile(absoluteFilePath: string): TranslationEntry[] {
     translationEntries.push({ key: keys, type: isVariable ? "variable" : "static" });
   }
 
+  // TODO: Implement check for translate function (used in side effects)
+
   return translationEntries;
 }
 
@@ -125,15 +127,30 @@ function saveTranslationEntries(entries: TranslationEntry[], config: DialectConf
   const targetLanguages = config.languages.filter((lang) => lang !== config.baseLanguage);
 
   for (const language of targetLanguages) {
-    const languageTranslationsFilePath = path.resolve(localesDirPath, `${language}.json`);
+    const translationsFilePath = path.resolve(localesDirPath, `${language}.json`);
 
-    const languageTranslationsMap = entries.reduce((map, entry) => {
+    const translationsMap = entries.reduce((map, entry) => {
       const entryKey = entry.key.join(keyDelimiter);
       return { ...map, [entryKey]: "" };
     }, {});
 
-    if (!fs.existsSync(languageTranslationsFilePath)) {
-      fs.writeFileSync(languageTranslationsFilePath, JSON.stringify(languageTranslationsMap, null, 2));
+    if (!fs.existsSync(translationsFilePath)) {
+      fs.writeFileSync(translationsFilePath, JSON.stringify(translationsMap, null, 2));
+    } else {
+      const existingTranslationsMap = JSON.parse(fs.readFileSync(translationsFilePath, "utf-8")) as Record<
+        string,
+        string
+      >;
+
+      const mergedTranslationsMap = Object.keys(translationsMap).reduce((map, key) => {
+        if (!map[key]) {
+          return { ...map, [key]: translationsMap[key] };
+        } else return map;
+      }, existingTranslationsMap);
+
+      // TODO: Add option to remove unused translation entries
+
+      fs.writeFileSync(translationsFilePath, JSON.stringify(mergedTranslationsMap, null, 2));
     }
   }
 }

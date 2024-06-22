@@ -30,16 +30,15 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
       <Trans>Next gen translation library</Trans>
-      <Trans>The count is {count}</Trans>
+      <Trans>It supports interpolation like so: {count}</Trans>
       <Trans>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi
-        blanditiis, consectetur delectus deserunt dignissimos eius id in
-        inventore ipsam iste minus, modi nam nihil non odio perspiciatis quas{" "}
-        quo voluptate.
+        Even with long paragraph statements that get formatted into multiple
+        lines with tools like Prettier, react-dialect just works.
       </Trans>
       <Trans>
-        Lorem ipsum {count} dolor sit amet, consectetur adipisicing elit. Animi
-        blanditiis, consectetur delectus deserunt dignissimos with {count}
+        Even better, long paragraph statements that get reformatted can still
+        contain interpolated values like so: {count} and a second like so:{" "}
+        {count} and still be parsed by react-dialect
       </Trans>
     </>
   );

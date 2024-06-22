@@ -4,14 +4,12 @@ A next-gen translation library for React
 
 ## Features
 
-- An easier mental model for translations instead of cumbersome translation keys.
-
-  No more back and forth to the translation file to know the exact text in a tag.
+- WYSWYG base translations values (I.e. Strings you type become the base translation for the `baseLanguage`)
 
   ```typescript jsx
   {/** Use this */}
   <Translate as="p" className="w-auto text-center">
-    The quick brown fox jumped over the lazy dog
+    The quick brown fox jumped over the lazy dog {/* Base text for "en" */}
   <Translate/>
 
   {/** instead of this */}
@@ -20,13 +18,20 @@ A next-gen translation library for React
   </p>
   ```
 
-- Build translations configuration using a simple CLI command
+- No additional config for interpolated values. It just works
 
-  ```shell
-  react-dialect build
+  ```typescript jsx
+  const [count, setCount] = useState(0);
+
+  <button onClick={() => setCount(count + 1)}>Inc</button>
+
+  <Translate as="p" className="w-auto text-center">
+    The count is currently {count}.
+  <Translate/>
   ```
 
-  This analyzes your project and creates the necessary configuration and translation files
+- Build translation files with up-to-date keys with a simple `react-dialect build`
+- Optionally remove unused translation keys to keep your translation files
 
 ## Project Goals
 
