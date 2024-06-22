@@ -1,5 +1,6 @@
 {
   "content": ["src"],
   "languages": ["en", "fr", "ge"],
-  "base": "en"
+  "baseLanguage": "en",
+  "outDir": "src/i18n"
 }

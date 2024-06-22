@@ -3,7 +3,6 @@
 import * as path from "path";
 import * as fs from "fs";
 
-const CONFIG_FILE_NAME = "dialect.config.json";
 const SUPPORTED_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx"];
 
 export default async function build() {
@@ -13,24 +12,27 @@ export default async function build() {
     return [...entries, ...processDirectory(root, config)];
   }, [] as TranslationEntry[]);
 
-  console.dir(entries, { depth: null });
+  saveTranslationEntries(entries, config);
 }
 
 function parseConfigFile(): DialectConfig {
-  const configFilePath = path.resolve(process.cwd(), CONFIG_FILE_NAME);
-  if (!fs.existsSync(configFilePath)) throw `missing "${CONFIG_FILE_NAME}"`;
+  const configFileName = "dialect.config.json";
+  const configFilePath = path.resolve(process.cwd(), configFileName);
+  if (!fs.existsSync(configFilePath)) throw `missing "${configFileName}"`;
 
   const config = JSON.parse(fs.readFileSync(configFilePath, "utf-8")) as DialectConfig;
-  if (!config.content) throw `missing "content" field in "${CONFIG_FILE_NAME}"`;
+  if (!config.content) throw `missing required "content" field in "${configFileName}"`;
   if (!Array.isArray(config.content)) throw `"content" must be an array`;
   if (config.content.length === 0) throw `"content" must contain at least one entry`;
 
-  if (!config.languages) throw `missing "languages" field in "${CONFIG_FILE_NAME}"`;
+  if (!config.languages) throw `missing required "languages" field in "${configFileName}"`;
   if (!Array.isArray(config.languages)) throw `"languages" must be an array`;
   if (config.languages.length === 0) throw `"language" must contain at least one entry`;
 
-  if (!config.base) throw `missing "base" field in "${CONFIG_FILE_NAME}"`;
-  if (!config.languages.includes(config.base)) throw `"base" must be included in "languages" array`;
+  if (!config.baseLanguage) throw `missing required "baseLanguage" field in "${configFileName}"`;
+  if (!config.languages.includes(config.baseLanguage)) throw `"baseLanguage" must be included in "languages" array`;
+
+  if (!config.outDir) throw `missing required "outDir" field in "${configFileName}"`;
 
   return config;
 }
@@ -40,6 +42,7 @@ function processDirectory(relativePath: string, config: DialectConfig): Translat
   const dirPath = path.resolve(cwd, relativePath);
   if (!fs.existsSync(dirPath)) throw `"${dirPath}" does not exist`;
   if (!fs.lstatSync(dirPath).isDirectory()) throw `"${dirPath}" is not a directory`;
+  if (!path.relative(relativePath, config.outDir)) return []; // Skip processing of "outDir" directory
 
   const dirents = fs.readdirSync(dirPath, { withFileTypes: true });
   const dirDirents = dirents.filter((d) => d.isDirectory());
@@ -50,7 +53,7 @@ function processDirectory(relativePath: string, config: DialectConfig): Translat
   for (const dirent of fileDirents) {
     const parentPath = dirent.parentPath ?? dirent.path;
     const absolutePath = path.resolve(parentPath, dirent.name);
-    translationEntries.push(...processFile(absolutePath, config));
+    translationEntries.push(...processFile(absolutePath));
   }
 
   for (const dirent of dirDirents) {
@@ -62,7 +65,7 @@ function processDirectory(relativePath: string, config: DialectConfig): Translat
   return translationEntries;
 }
 
-function processFile(absoluteFilePath: string, config: DialectConfig): TranslationEntry[] {
+function processFile(absoluteFilePath: string): TranslationEntry[] {
   const sourceCode = fs.readFileSync(absoluteFilePath, { encoding: "utf-8" });
   const defaultImportRegex = /^import ?\{ ?(\w+) ?\} ?from ['"]react-dialect['"];?$/m;
   const aliasedImportRegex = /^import ?\{ ?Translate as (\w+) ?\} ?from ['"]react-dialect['"];?$/m;
@@ -77,7 +80,7 @@ function processFile(absoluteFilePath: string, config: DialectConfig): Translati
 
   for (const match of translationStringMatches) {
     const tokens = tokenizeString(match[1]);
-    const keys = tokens.map((token) => token.value);
+    const keys = tokens.map((token) => token.value.toLowerCase());
     const isVariable = tokens.reduce((isVar, token) => isVar || token.type === "variable", false);
 
     translationEntries.push({ key: keys, type: isVariable ? "variable" : "static" });
@@ -114,4 +117,29 @@ function tokenizeString(translationStr: string) {
   }
 
   return tokens;
+}
+
+function saveTranslationEntries(entries: TranslationEntry[], config: DialectConfig) {
+  const cwd = process.cwd();
+  const keyDelimiter = "____";
+  const outDirAbsolutePath = path.resolve(cwd, config.outDir);
+  if (!fs.existsSync(outDirAbsolutePath)) fs.mkdirSync(outDirAbsolutePath);
+
+  const translationsDirAbsolutePath = path.resolve(outDirAbsolutePath, "translations");
+  if (!fs.existsSync(translationsDirAbsolutePath)) fs.mkdirSync(translationsDirAbsolutePath);
+
+  const targetLanguages = config.languages.filter((lang) => lang !== config.baseLanguage);
+
+  for (const language of targetLanguages) {
+    const languageTranslationsFilePath = path.resolve(translationsDirAbsolutePath, `${language}.json`);
+
+    const languageTranslationsMap = entries.reduce((map, entry) => {
+      const entryKey = entry.key.join(keyDelimiter);
+      return { ...map, [entryKey]: "" };
+    }, {});
+
+    if (!fs.existsSync(languageTranslationsFilePath)) {
+      fs.writeFileSync(languageTranslationsFilePath, JSON.stringify(languageTranslationsMap, null, 2));
+    }
+  }
 }
