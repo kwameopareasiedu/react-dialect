@@ -5,18 +5,18 @@ import * as fs from "fs";
 
 const CONFIG_FILE_NAME = "dialect.config.json";
 const SUPPORTED_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx"];
-const DEFAULT_IMPORT_STATEMENT = /^import ?\{ ?(\w+) ?\} ?from ['"]react-dialect['"];?$/m;
-const ALIASED_IMPORT_STATEMENT = /^import ?\{ ?Translate as (\w+) ?\} ?from ['"]react-dialect['"];?$/m;
 
 export default async function build() {
   const config = parseConfigFile();
 
-  config.roots.forEach((root) => {
-    processDirectory(root, config);
-  });
+  const entries = config.roots.reduce((entries, root) => {
+    return [...entries, ...processDirectory(root, config)];
+  }, [] as TranslationEntry[]);
+
+  console.dir(entries, { depth: null });
 }
 
-function parseConfigFile() {
+function parseConfigFile(): DialectConfig {
   const configFilePath = path.resolve(process.cwd(), CONFIG_FILE_NAME);
   if (!fs.existsSync(configFilePath)) throw `missing "${CONFIG_FILE_NAME}"`;
 
@@ -35,7 +35,7 @@ function parseConfigFile() {
   return config;
 }
 
-function processDirectory(relativePath: string, config: DialectConfig) {
+function processDirectory(relativePath: string, config: DialectConfig): TranslationEntry[] {
   const cwd = process.cwd();
   const dirPath = path.resolve(cwd, relativePath);
   if (!fs.existsSync(dirPath)) throw `"${dirPath}" does not exist`;
@@ -45,33 +45,73 @@ function processDirectory(relativePath: string, config: DialectConfig) {
   const dirDirents = dirents.filter((d) => d.isDirectory());
   const fileDirents = dirents.filter((d) => d.isFile() && SUPPORTED_EXTENSIONS.includes(path.extname(d.name)));
 
+  const translationEntries: TranslationEntry[] = [];
+
   for (const dirent of fileDirents) {
     const parentPath = dirent.parentPath ?? dirent.path;
     const absolutePath = path.resolve(parentPath, dirent.name);
-    processFile(absolutePath, config);
+    translationEntries.push(...processFile(absolutePath, config));
   }
 
   for (const dirent of dirDirents) {
     const parentPath = dirent.parentPath ?? dirent.path;
     const absolutePath = path.resolve(parentPath, dirent.name);
-    processDirectory(path.relative(cwd, absolutePath), config);
+    translationEntries.push(...processDirectory(path.relative(cwd, absolutePath), config));
   }
+
+  return translationEntries;
 }
 
-function processFile(absoluteFilePath: string, config: DialectConfig) {
-  const source = fs.readFileSync(absoluteFilePath, { encoding: "utf-8" });
-  const componentImportNameMatch = source.match(DEFAULT_IMPORT_STATEMENT) ?? source.match(ALIASED_IMPORT_STATEMENT);
-  if (!componentImportNameMatch) return; // No `import { Translate } from "react-dialect"` statement
+function processFile(absoluteFilePath: string, config: DialectConfig): TranslationEntry[] {
+  const sourceCode = fs.readFileSync(absoluteFilePath, { encoding: "utf-8" });
+  const defaultImportRegex = /^import ?\{ ?(\w+) ?\} ?from ['"]react-dialect['"];?$/m;
+  const aliasedImportRegex = /^import ?\{ ?Translate as (\w+) ?\} ?from ['"]react-dialect['"];?$/m;
+  const componentImportNameMatch = sourceCode.match(defaultImportRegex) ?? sourceCode.match(aliasedImportRegex);
+  if (!componentImportNameMatch) return []; // No `import { Translate } from "react-dialect"` statement
 
   const componentImportName = componentImportNameMatch[1];
-  const componentStringRegex = new RegExp(`<${componentImportName}(?:.+)?>(.+)<\\/${componentImportName}>`, "g");
-  const componentStringMatchesIter = source.matchAll(componentStringRegex);
+  const translationStringRegex = new RegExp(`<${componentImportName}(?:.+)??>(.+?)<\\/${componentImportName}>`, "gs");
+  const translationStringMatches = sourceCode.matchAll(translationStringRegex);
 
-  const componentStrings = [] as string[];
+  const translationEntries: TranslationEntry[] = [];
 
-  for (const match of componentStringMatchesIter) {
-    componentStrings.push(match[1]);
+  for (const match of translationStringMatches) {
+    const tokens = tokenizeString(match[1]);
+    const keys = tokens.map((token) => token.value);
+    const isVariable = tokens.reduce((isVar, token) => isVar || token.type === "variable", false);
+
+    translationEntries.push({ key: keys, type: isVariable ? "variable" : "static" });
   }
 
-  console.log(componentStrings);
+  return translationEntries;
+}
+
+function tokenizeString(translationStr: string) {
+  let str = translationStr.trim();
+  str = str.replaceAll("\n", " "); // Replace new lines with white space
+  str = str.replaceAll(/\{"( +)?"\}/g, " "); // Replace interpolated consecutive whitespaces with a single one
+  str = str.replaceAll(/ {2,}/g, " "); // Replace consecutive whitespaces with a single one
+
+  const tokens = [] as KeyToken[];
+  let currentToken = "";
+  let pos = 0;
+
+  while (pos < str.length) {
+    const char = str[pos++];
+
+    if (char === "{") {
+      tokens.push({ type: "static", value: currentToken });
+      currentToken = char;
+    } else if (char === "}") {
+      currentToken += char;
+      tokens.push({ type: "variable", value: currentToken });
+      currentToken = "";
+    } else currentToken += char;
+  }
+
+  if (currentToken) {
+    tokens.push({ type: "static", value: currentToken });
+  }
+
+  return tokens;
 }
