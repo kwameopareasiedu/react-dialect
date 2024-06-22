@@ -1,5 +1,5 @@
 interface DialectConfig {
-  roots: string[];
+  content: string[];
   languages: string[];
   base: string;
 }

@@ -1,5 +1,5 @@
 {
-  "roots": ["src"],
-  "languages": ["en"],
+  "content": ["src"],
+  "languages": ["en", "fr", "ge"],
   "base": "en"
 }

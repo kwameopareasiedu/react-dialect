@@ -9,7 +9,7 @@ const SUPPORTED_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx"];
 export default async function build() {
   const config = parseConfigFile();
 
-  const entries = config.roots.reduce((entries, root) => {
+  const entries = config.content.reduce((entries, root) => {
     return [...entries, ...processDirectory(root, config)];
   }, [] as TranslationEntry[]);
 
@@ -21,9 +21,9 @@ function parseConfigFile(): DialectConfig {
   if (!fs.existsSync(configFilePath)) throw `missing "${CONFIG_FILE_NAME}"`;
 
   const config = JSON.parse(fs.readFileSync(configFilePath, "utf-8")) as DialectConfig;
-  if (!config.roots) throw `missing "roots" field in "${CONFIG_FILE_NAME}"`;
-  if (!Array.isArray(config.roots)) throw `"roots" must be an array`;
-  if (config.roots.length === 0) throw `"roots" must contain at least one entry`;
+  if (!config.content) throw `missing "content" field in "${CONFIG_FILE_NAME}"`;
+  if (!Array.isArray(config.content)) throw `"content" must be an array`;
+  if (config.content.length === 0) throw `"content" must contain at least one entry`;
 
   if (!config.languages) throw `missing "languages" field in "${CONFIG_FILE_NAME}"`;
   if (!Array.isArray(config.languages)) throw `"languages" must be an array`;
