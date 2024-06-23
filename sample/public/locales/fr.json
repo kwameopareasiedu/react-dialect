@@ -1,10 +1,10 @@
 {
-  "next gen translation library": "",
+  "next gen translation library": "Bibliothèque de traduction nouvelle génération",
   "the count is ____{count}": "",
   "lorem ipsum dolor sit amet, consectetur adipisicing elit. animi blanditiis, consectetur delectus deserunt dignissimos eius id in inventore ipsam iste minus, modi nam nihil non odio perspiciatis quas quo voluptate.": "",
   "lorem ipsum ____{count}____ dolor sit amet, consectetur adipisicing elit. animi blanditiis, consectetur delectus deserunt dignissimos with ____{count}": "",
-  "it supports interpolation like so: ____{count}": "",
-  "even with long paragraph statements that get formatted into multiple lines with tools like prettier, react-dialect just works.": "",
-  "even better, long paragraph statements that get reformatted can still contain interpolated values like so: ____{count}____ and a second like so: ____{count}____ and still be parsed by react-dialect": "",
-  "sanity check for translations in multiple files": ""
+  "it supports interpolation like so: ____{count}": "il prend en charge l'interpolation comme ceci: {count}",
+  "even with long paragraph statements that get formatted into multiple lines with tools like prettier, react-dialect just works.": "Even with long paragraph statements that get formatted into multiple lines with tools like Prettier, react-dialect just works",
+  "even better, long paragraph statements that get reformatted can still contain interpolated values like so: ____{count}____ and a second like so: ____{count}____ and still be parsed by react-dialect": "Même avec de longs paragraphes formatés en plusieurs lignes avec des outils comme Prettier, le dialecte de réaction fonctionne tout simplement.",
+  "sanity check for translations in multiple files": "Mieux encore, les instructions de paragraphe long qui sont reformatées peuvent toujours contenir des valeurs interpolées comme ceci : {count} et une seconde comme ceci : {count} et toujours être analysées par réagir-dialecte"
 }

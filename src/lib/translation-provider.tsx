@@ -1,9 +1,10 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 
 interface TranslationContextProps {
-  language: string;
+  currentLanguage: string;
   downloading: boolean;
-  setLanguage: (language: string) => void;
+  setCurrentLanguage: (language: string) => void;
+  translate: (content: string | string[]) => ReactNode;
 }
 
 const TranslationContext = createContext<TranslationContextProps>(null as never);
@@ -25,38 +26,40 @@ export function TranslationProvider({ baseLanguage, languages, children }: Trans
   const [translations, setTranslations] = useState<Translations>({});
   const [downloading, setDownloading] = useState(false);
 
-  const handleSetLanguage = async (language: string) => {
+  const handleSetCurrentLanguage = async (language: string) => {
+    if (downloading) return;
     if (!languages.includes(language)) throw `unsupported language: ${language}`;
-    if (downloading || translations[language] || language === baseLanguage) return;
 
-    try {
-      setDownloading(true);
-      const response = await fetch(`/locales/${language}.json`);
-      const content = await response.json();
+    if (language === baseLanguage) {
       setCurrentLanguage(language);
-      setTranslations((trans) => ({
-        ...trans,
-        [language]: content,
-      }));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setDownloading(false);
+    } else if (!translations[language]) {
+      try {
+        setDownloading(true);
+        const response = await fetch(`/locales/${language}.json`);
+        const content = await response.json();
+        setTranslations({ ...translations, [language]: content });
+        setCurrentLanguage(language);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setDownloading(false);
+      }
     }
   };
 
-  useEffect(() => {
-    if (Object.keys(translations > 0)) {
-      console.log(translations);
-    }
-  }, [translations]);
+  const translate = (content: string | string[]) => {
+    console.log(currentLanguage, content);
+    if (currentLanguage === baseLanguage) return content;
+    return "";
+  };
 
   return (
     <TranslationContext.Provider
       value={{
-        language: currentLanguage,
-        setLanguage: handleSetLanguage,
         downloading: downloading,
+        currentLanguage: currentLanguage,
+        setCurrentLanguage: handleSetCurrentLanguage,
+        translate: translate,
       }}>
       {children}
     </TranslationContext.Provider>

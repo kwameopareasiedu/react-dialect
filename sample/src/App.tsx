@@ -6,7 +6,7 @@ import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
-  const { setLanguage } = useTranslation();
+  const { setCurrentLanguage } = useTranslation();
 
   return (
     <>
@@ -37,9 +37,9 @@ function App() {
       </p>
 
       <div className="flex items-center justify-between gap-8">
-        <button onClick={() => setLanguage("en")}>En</button>
-        <button onClick={() => setLanguage("fr")}>Fr</button>
-        <button onClick={() => setLanguage("ge")}>Ge</button>
+        <button onClick={() => setCurrentLanguage("en")}>En</button>
+        <button onClick={() => setCurrentLanguage("fr")}>Fr</button>
+        <button onClick={() => setCurrentLanguage("ge")}>Ge</button>
       </div>
 
       <Trans>Next gen translation library</Trans>

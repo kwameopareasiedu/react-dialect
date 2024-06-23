@@ -1,13 +1,18 @@
-import React, { ComponentPropsWithoutRef, ElementType } from "react";
+import React, { ComponentPropsWithoutRef, ElementType, useMemo } from "react";
+import { useTranslation } from "@/lib/translation-provider";
 
 type TranslateProps<T extends ElementType> = {
   as?: T;
-  children: string;
+  children: string | string[];
 } & ComponentPropsWithoutRef<T>;
 
 export function Translate<T extends ElementType = "p">({ as, children, ...rest }: TranslateProps<T>) {
   const Root = as ?? "p";
-  // console.log(children);
+  const { translate, currentLanguage } = useTranslation();
 
-  return <Root {...rest}>{children}</Root>;
+  const translated = useMemo(() => {
+    return translate(children);
+  }, [children, currentLanguage]);
+
+  return <Root {...rest}>{translated}</Root>;
 }
