@@ -33,16 +33,22 @@ A next-gen translation library for React
 - Build translation files with up-to-date keys with a simple `react-dialect build`
 - Optionally remove unused translation keys to keep your translation files
 
-## Project Goals
+## How It Works
 
-1. [x] Provide a `Translate` component which is a polymorphic component, allowing custom components via the `as` prop.
-2. [ ] Provide a CLI interface which analyzes the project from an entry point and creates the translation locales and
-       other configuration.
+`react-dialect` provides translations quite differently from other i18n solutions. This is outlined below:
 
-## Build Process
+1. First, we'll need to build the translation files. This is done by analyzing the codebase for usages of `<Translate>`
+   tags and creating keys out of the children. The end result is a number of generated json files in `public/locales`,
+   each containing translations for a language.
+2. Next, we make these translations available to the rest of the app using React's Context API. Translations are lazily
+   loaded when the language is switched.
+3. Lastly, during runtime, the `<Translate>` component will choose which translation to use. An advantage here is, there
+   is no wait time for the initial translation since they are part of the source code.
+
+### Building Translation Files
 
 1. Parse the `dialect.config.json` file
-2. Recursively traverse the files in each directory path in the `content` array. For each file perform steps 3 to 8
+2. Recursively traverse the files in each directory path in the `content` array. For each file perform steps 3 to 6
 3. Find either the default or aliased import statement for the `Translate` component from `react-dialect`.
 4. Find all `<Translate>Lorem ipsum</Translate>` statements and extract the `children` string. _This will be the key
    for the translation_
@@ -70,17 +76,22 @@ A next-gen translation library for React
    Lorem ipsum {count} dolor sit amet, consectetur adipisicing elit. Animi blanditiis, consectetur delectus deserunt dignissimos eius id in inventore ipsam iste minus, modi nam nihil non odio perspiciatis quas quo voluptate.
    ```
 
-6. Create a key for the extracted string in the same way React parses `children` prop
+6. Create a key for the extracted string in a similar way React parses `children` prop
    - For **static** strings, the key would be the text of the string in an array
      ```
-     Source: <Translate>Hello world!</Translate>
-     Key   : ["Hello world!"]
+     Source       : <Translate>Hello world!</Translate>
+     Key Fragments: ["Hello world!"]
+     Key          : "hello world!"
      ```
    - **Variable** strings are broken up at the interpolations and the segments become the key
      ```
-     Source: <Translate>I am {userName} and I love coding!</Translate>
-     Key   : ["I am ", "{userName}", " and I love coding!"]
+     Source       : <Translate>I am {userName} and I love coding!</Translate>
+     Key Fragments: ["I am ", "{userName}", " and I love coding!"]
+     Key:         : "i am ____{userName}____ and i love coding!"
      ```
+
+7. Save the generated translation keys to the respective language json file. If the file exists, merge in the new keys.
+   Unless the `--remove-unused` flag is used, keep any unused translation keys.
 
 ## Contributors
 
