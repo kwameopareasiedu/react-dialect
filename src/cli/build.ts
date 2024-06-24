@@ -5,14 +5,14 @@ import * as fs from "fs";
 
 const SUPPORTED_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx"];
 
-export default async function build() {
-  const config = parseConfigFile();
+export default async function build(cliConfig: CliConfig) {
+  const projectConfig = parseConfigFile();
 
-  const entries = config.content.reduce((entries, root) => {
-    return [...entries, ...processDirectory(root, config)];
+  const entries = projectConfig.content.reduce((entries, root) => {
+    return [...entries, ...processDirectory(root)];
   }, [] as TranslationEntry[]);
 
-  saveTranslationEntries(entries, config);
+  saveTranslationEntries(entries, projectConfig, cliConfig);
 }
 
 function parseConfigFile(): DialectConfig {
@@ -35,7 +35,7 @@ function parseConfigFile(): DialectConfig {
   return config;
 }
 
-function processDirectory(relativePath: string, config: DialectConfig): TranslationEntry[] {
+function processDirectory(relativePath: string): TranslationEntry[] {
   const cwd = process.cwd();
   const dirPath = path.resolve(cwd, relativePath);
   if (!fs.existsSync(dirPath)) throw `"${dirPath}" does not exist`;
@@ -56,7 +56,7 @@ function processDirectory(relativePath: string, config: DialectConfig): Translat
   for (const dirent of dirDirents) {
     const parentPath = dirent.parentPath ?? dirent.path;
     const absolutePath = path.resolve(parentPath, dirent.name);
-    translationEntries.push(...processDirectory(path.relative(cwd, absolutePath), config));
+    translationEntries.push(...processDirectory(path.relative(cwd, absolutePath)));
   }
 
   return translationEntries;
@@ -64,12 +64,9 @@ function processDirectory(relativePath: string, config: DialectConfig): Translat
 
 function processFile(absoluteFilePath: string): TranslationEntry[] {
   const sourceCode = fs.readFileSync(absoluteFilePath, { encoding: "utf-8" });
-  const defaultImportRegex = /^import ?\{ ?(\w+) ?\} ?from ['"]react-dialect['"];?$/m;
-  const aliasedImportRegex = /^import ?\{ ?Translate as (\w+) ?\} ?from ['"]react-dialect['"];?$/m;
-  const componentImportNameMatch = sourceCode.match(defaultImportRegex) ?? sourceCode.match(aliasedImportRegex);
-  if (!componentImportNameMatch) return []; // No `import { Translate } from "react-dialect"` statement
+  const componentImportName = getTranslateComponentImportName(sourceCode);
+  if (!componentImportName) return []; // No import of Translate from "react-dialect"
 
-  const componentImportName = componentImportNameMatch[1];
   const translationStringRegex = new RegExp(`<${componentImportName}(?:.+)??>(.+?)<\\/${componentImportName}>`, "gs");
   const translationStringMatches = sourceCode.matchAll(translationStringRegex);
 
@@ -86,6 +83,28 @@ function processFile(absoluteFilePath: string): TranslationEntry[] {
   // TODO: Implement check for translate function (used in side effects)
 
   return translationEntries;
+}
+
+function getTranslateComponentImportName(source: string) {
+  const importPatternRegex = /^import ?\{([\w \n,]+?)\} ?from ['"]react-dialect['"];?$/ms;
+  const importStringMatch = source.match(importPatternRegex);
+  if (!importStringMatch) return null;
+
+  const importedString = importStringMatch[1].trim();
+  const importedModuleNames = importedString.split(",").map((part) => part.trim());
+
+  for (const moduleName of importedModuleNames) {
+    if (moduleName === "Translate") {
+      // Translate is imported as is
+      return moduleName;
+    } else if (moduleName.indexOf("as") !== -1) {
+      // Translate is import using an alias
+      const parts = moduleName.split("as ");
+      return parts[1];
+    }
+  }
+
+  return null;
 }
 
 function tokenizeString(translationStr: string) {
@@ -118,37 +137,41 @@ function tokenizeString(translationStr: string) {
   return tokens;
 }
 
-function saveTranslationEntries(entries: TranslationEntry[], config: DialectConfig) {
+function saveTranslationEntries(entries: TranslationEntry[], projectConfig: DialectConfig, cliConfig: CliConfig) {
   const cwd = process.cwd();
-  const keyDelimiter = "____";
   const localesDirPath = path.resolve(cwd, "public", "locales");
   if (!fs.existsSync(localesDirPath)) fs.mkdirSync(localesDirPath, { recursive: true });
 
-  const targetLanguages = config.languages.filter((lang) => lang !== config.baseLanguage);
+  const targetLanguages = projectConfig.languages.filter((lang) => lang !== projectConfig.baseLanguage);
 
   for (const language of targetLanguages) {
     const translationsFilePath = path.resolve(localesDirPath, `${language}.json`);
-
-    const translationsMap = entries.reduce((map, entry) => {
-      const entryKey = entry.key.join(keyDelimiter);
-      return { ...map, [entryKey]: "" };
-    }, {});
+    const newTranslationsMap = entries.reduce((map, entry) => ({ ...map, [entry.key.join("")]: "" }), {});
 
     if (!fs.existsSync(translationsFilePath)) {
-      fs.writeFileSync(translationsFilePath, JSON.stringify(translationsMap, null, 2));
+      fs.writeFileSync(translationsFilePath, JSON.stringify(newTranslationsMap, null, 2));
     } else {
-      const existingTranslationsMap = JSON.parse(fs.readFileSync(translationsFilePath, "utf-8")) as Record<
-        string,
-        string
-      >;
+      const existingTranslationsMap = JSON.parse(fs.readFileSync(translationsFilePath, "utf-8")) as {
+        [k: string]: string;
+      };
 
-      const mergedTranslationsMap = Object.keys(translationsMap).reduce((map, key) => {
+      const mergedTranslationsMap = Object.keys(newTranslationsMap).reduce((map, key) => {
         if (!map[key]) {
-          return { ...map, [key]: translationsMap[key] };
+          return { ...map, [key]: newTranslationsMap[key] };
         } else return map;
       }, existingTranslationsMap);
 
       // TODO: Add option to remove unused translation entries
+      if (cliConfig.removeUnused) {
+        const mergedKeys = Object.keys(mergedTranslationsMap);
+        const newKeys = Object.keys(newTranslationsMap);
+
+        for (const key of mergedKeys) {
+          if (!newKeys.includes(key)) {
+            delete mergedTranslationsMap[key];
+          }
+        }
+      }
 
       fs.writeFileSync(translationsFilePath, JSON.stringify(mergedTranslationsMap, null, 2));
     }

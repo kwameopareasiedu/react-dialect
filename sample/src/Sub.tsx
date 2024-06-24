@@ -1,9 +1,11 @@
-import { Translate } from "react-dialect";
+import { Translate as VeryLongImportedNameTranslation_1Component } from "react-dialect";
 
 export default function Sub() {
   return (
     <div>
-      <Translate>Sanity check for translations in multiple files</Translate>
+      <VeryLongImportedNameTranslation_1Component>
+        Sanity check for translations in multiple files
+      </VeryLongImportedNameTranslation_1Component>
     </div>
   );
 }

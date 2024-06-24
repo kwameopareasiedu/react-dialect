@@ -4,6 +4,10 @@ interface DialectConfig {
   baseLanguage: string;
 }
 
+interface CliConfig {
+  removeUnused?: boolean;
+}
+
 interface TranslationEntry {
   key: string[];
   type: "static" | "variable";

@@ -8,7 +8,8 @@ dialect.version("0.1.0");
 dialect
   .command("build")
   .description("Build translation locales and configuration files")
-  .action(() => tryCatch(build()));
+  .option("-r, --remove-unused", "Remove unused translations")
+  .action((options) => tryCatch(build(options as CliConfig)));
 
 dialect.parse(process.argv);
 
