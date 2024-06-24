@@ -1,7 +1,7 @@
 {
-  "next gen translation library": "",
-  "even with long paragraph statements that get formatted into multiple lines with tools like prettier, react-dialect just works.": "",
-  "sanity check for translations in multiple files": "",
-  "it supports interpolation like so: {count}": "",
-  "even better, long paragraph statements that get reformatted can still contain interpolated values like so: {count} and a second like so: {count} and still be parsed by react-dialect": ""
+  "Next gen translation library": "",
+  "It supports interpolation like so: {count}": "",
+  "Even with long paragraph statements that get formatted into multiple lines with tools like Prettier, react-dialect just works.": "",
+  "Even better, long paragraph statements that get reformatted can still contain interpolated values like so: {count} and a second like so: {name} and still be parsed by react-dialect": "",
+  "Sanity check for translations in multiple files": ""
 }

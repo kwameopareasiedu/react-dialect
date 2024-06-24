@@ -3,9 +3,11 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import { Translate as Trans, useTranslation } from "react-dialect";
 import "./App.css";
+import { randFullName } from "@ngneat/falso";
 
 function App() {
   const [count, setCount] = useState(0);
+  const [name, setName] = useState(randFullName());
   const { setCurrentLanguage } = useTranslation();
 
   return (
@@ -26,6 +28,8 @@ function App() {
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
+
+        <button onClick={() => setName(randFullName())}>name is {name}</button>
 
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
@@ -51,7 +55,7 @@ function App() {
       <Trans>
         Even better, long paragraph statements that get reformatted can still
         contain interpolated values like so: {count} and a second like so:{" "}
-        {count} and still be parsed by react-dialect
+        {name} and still be parsed by react-dialect
       </Trans>
     </>
   );

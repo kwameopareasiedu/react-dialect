@@ -50,13 +50,40 @@ export function TranslationProvider({ baseLanguage, languages, children }: Trans
   };
 
   const translate = (content: string) => {
-    // console.log(currentLanguage, content);
     if (currentLanguage !== baseLanguage) {
       const map = translations[currentLanguage];
       const entries = Object.entries(map);
 
       for (const [key, value] of entries) {
         if (key === content) return value;
+
+        const placeholderFinderRegex = /({\w+})/g;
+        const placeholderCaptureRegexString = key.replaceAll(placeholderFinderRegex, "(.+?)"); // Convert key into regex string
+        const placeholderTestRegex = new RegExp(placeholderCaptureRegexString, "gm"); // Create test regex from modified key
+
+        // Using a RegExp changes its internal state, which is why we use two regexes for the same string
+        if (!placeholderTestRegex.test(content)) continue;
+
+        const placeholderCaptureRegex = new RegExp(placeholderCaptureRegexString, "gm"); // Create capture regex from modified key
+        const placeholderValueMatches = placeholderCaptureRegex.exec(content); // Get placeholder values from content
+        if (!placeholderValueMatches) continue;
+
+        const placeholderValues = placeholderValueMatches.slice(1, placeholderValueMatches.length);
+
+        const placeholderFinderRegex2 = /({\w+})/g;
+        let translated = value;
+
+        for (let i = 0; i < placeholderValues.length; i++) {
+          const placeholderMatches = placeholderFinderRegex2.exec(key);
+
+          if (placeholderMatches) {
+            const placeholder = placeholderMatches[1];
+            const replacement = placeholderValues[i];
+            translated = translated.replaceAll(placeholder, replacement);
+          }
+        }
+
+        return translated;
       }
 
       return "";
