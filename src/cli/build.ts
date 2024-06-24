@@ -74,7 +74,7 @@ function processFile(absoluteFilePath: string): TranslationEntry[] {
 
   for (const match of translationStringMatches) {
     const tokens = tokenizeString(match[1]);
-    const keys = tokens.map((token) => token.value.toLowerCase());
+    const keys = tokens.map((token) => token.value);
     const isVariable = tokens.reduce((isVar, token) => isVar || token.type === "variable", false);
 
     translationEntries.push({ key: keys, type: isVariable ? "variable" : "static" });
@@ -161,7 +161,6 @@ function saveTranslationEntries(entries: TranslationEntry[], projectConfig: Dial
         } else return map;
       }, existingTranslationsMap);
 
-      // TODO: Add option to remove unused translation entries
       if (cliConfig.removeUnused) {
         const mergedKeys = Object.keys(mergedTranslationsMap);
         const newKeys = Object.keys(newTranslationsMap);

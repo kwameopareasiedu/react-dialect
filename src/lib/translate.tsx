@@ -11,7 +11,7 @@ export function Translate<T extends ElementType = "p">({ as, children, ...rest }
   const { translate, currentLanguage } = useTranslation();
 
   const translated = useMemo(() => {
-    const joined = Children.toArray(children).join("").toLowerCase();
+    const joined = Children.toArray(children).join("");
     return translate(joined);
   }, [children, currentLanguage]);
 
