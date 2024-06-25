@@ -13,7 +13,7 @@ jobs:
           pkg-manager: yarn
       - run:
           name: Build translations generator
-          command: rollup -c
+          command: node_modules/.bin/rollup -c
       - run:
           name: Run tests
           command: yarn test
