@@ -9,7 +9,10 @@ dialect
   .command("build")
   .description("Build translation locales and configuration files")
   .option("-r, --remove-unused", "Remove unused translations")
-  .action((options) => tryCatch(build(options as CliConfig)));
+  .action(async (options) => {
+    const config = { ...options, $cwd: process.cwd() };
+    await tryCatch(build(config as CliConfig));
+  });
 
 dialect.parse(process.argv);
 
