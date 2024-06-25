@@ -1,23 +1,25 @@
 import test from "ava";
 import * as fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+import generate from "../../dist/generate.js";
 
-const PROJECT_ROOT = path.resolve(__dirname, "sample");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, "../../temp/sample");
 
 /** @param {string} segment */
 function resolveProjectPath(segment) {
   return path.resolve(PROJECT_ROOT, segment);
 }
 
-test.before(async () => {
-  // Setup test project directory
-
+test.before(() => {
   if (fs.existsSync(PROJECT_ROOT)) {
-    // Clear sample project directory
     fs.rmSync(PROJECT_ROOT, { recursive: true });
   }
 
-  // Create dialect config file
+  fs.mkdirSync(resolveProjectPath("src"), { recursive: true });
+
   fs.writeFileSync(
     resolveProjectPath("dialect.config.json"),
     `
@@ -26,10 +28,9 @@ test.before(async () => {
       "languages": ["en", "fr", "ge"],
       "baseLanguage": "en"
     }
-    `
+    `,
   );
 
-  // Create sourceFile config file
   fs.writeFileSync(
     resolveProjectPath("src/first.tsx"),
     `
@@ -63,10 +64,9 @@ test.before(async () => {
       }
       
       export default App;
-    `
+    `,
   );
 
-  // Create sourceFile config file
   fs.writeFileSync(
     resolveProjectPath("src/second.tsx"),
     `
@@ -83,12 +83,37 @@ test.before(async () => {
           </div>
         );
       }
-    `
+    `,
   );
 });
 
-test.after.always(async () => {});
+test.after.always(() => {
+  fs.rmSync(PROJECT_ROOT, { recursive: true });
+});
 
-test("ava works", (t) => {
-  t.is(true, true);
+test("generates translations correctly", async (t) => {
+  /** @type CliConfig */
+  const config = { $cwd: PROJECT_ROOT };
+
+  await generate(config);
+
+  const expectedFiles = [
+    { language: "French", filePath: resolveProjectPath("public/locales/fr.json") },
+    { language: "German", filePath: resolveProjectPath("public/locales/ge.json") },
+  ];
+
+  const expectedKeys = [
+    "Next gen translation library",
+    "It supports interpolation like so: {count}",
+    "Even with long paragraph statements that get formatted into multiple lines with tools like Prettier, react-dialect just works.",
+    "Even better, long paragraph statements that get reformatted can still contain interpolated values like so: {count} and a second like so: {name} and still be parsed by react-dialect",
+    "React dialect can even replace the same value interpolated multiple times in a string. As an example, the count is {count}, {count} and {count}.",
+    "Sanity check for translations in multiple files",
+  ];
+
+  for (const { language, filePath } of expectedFiles) {
+    t.true(fs.existsSync(filePath), `${language} translations missing`);
+    const keys = Object.keys(JSON.parse(fs.readFileSync(filePath, { encoding: "utf-8" })));
+    t.deepEqual(keys, expectedKeys, `Translation keys in ${language}.json don't match`);
+  }
 });

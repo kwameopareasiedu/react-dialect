@@ -5,11 +5,11 @@ import * as fs from "fs";
 
 const SUPPORTED_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx"];
 
-export default async function build(cliConfig: CliConfig) {
+export default async function generate(cliConfig: CliConfig) {
   const projectConfig = parseConfigFile(cliConfig);
 
-  const keys = projectConfig.content.reduce((entries, root) => {
-    return [...entries, ...processDirectory(root, cliConfig)];
+  const keys = projectConfig.content.reduce((keys, root) => {
+    return [...keys, ...processDirectory(root, cliConfig)];
   }, [] as string[]);
 
   saveTranslationEntries(keys, projectConfig, cliConfig);
@@ -69,16 +69,9 @@ function processFile(absoluteFilePath: string): string[] {
 
   const translationStringRegex = new RegExp(`<${componentImportName}(?:.+)??>(.+?)<\\/${componentImportName}>`, "gs");
   const translationStringMatches = sourceCode.matchAll(translationStringRegex);
-
   const translationKeys: string[] = [];
 
   for (const match of translationStringMatches) {
-    // const tokens = tokenizeString(match[1]);
-    // const keys = tokens.map((token) => token.value);
-    // const isVariable = tokens.reduce((isVar, token) => isVar || token.type === "variable", false);
-
-    // translationKeys.push({ key: keys, type: isVariable ? "variable" : "static" });
-
     const key = match[1]
       .trim()
       .replaceAll("\n", " ") // Replace new lines with white space
@@ -94,8 +87,14 @@ function processFile(absoluteFilePath: string): string[] {
 }
 
 function getTranslateComponentImportName(source: string) {
+  const prettySource = source
+    .split(/[\n;]/g) // Split by new line or semicolon
+    .map((line) => line.trim())
+    .filter((line) => !!line)
+    .join("\n");
+
   const importPatternRegex = /^import ?\{([\w \n,]+?)\} ?from ['"]react-dialect['"];?$/ms;
-  const importStringMatch = source.match(importPatternRegex);
+  const importStringMatch = prettySource.match(importPatternRegex);
   if (!importStringMatch) return null;
 
   const importedString = importStringMatch[1].trim();
@@ -154,7 +153,6 @@ function saveTranslationEntries(keys: string[], projectConfig: DialectConfig, cl
 
   for (const language of targetLanguages) {
     const translationsFilePath = path.resolve(localesDirPath, `${language}.json`);
-    // const newTranslationsMap = keys.reduce((map, entry) => ({ ...map, [entry.key.join("")]: "" }), {});
     const newTranslationsMap = keys.reduce((map, key) => ({ ...map, [key]: "" }), {});
 
     if (!fs.existsSync(translationsFilePath)) {
