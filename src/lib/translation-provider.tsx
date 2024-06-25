@@ -84,6 +84,32 @@ export function TranslationProvider({ baseLanguage, languages, children }: Trans
         }
 
         return translated;
+
+        /* Named capture group */
+        // TODO: Fix duplicate capture group error later
+        // const placeholderFinderRegex = /{(\w+)}/g;
+        // const placeholderCaptureRegexString = key.replaceAll(placeholderFinderRegex, "(?<$1>.+?)"); // Convert key into regex string
+        // const placeholderTestRegex = new RegExp(placeholderCaptureRegexString, "gm"); // Create test regex from modified key
+        //
+        // // Using a RegExp changes its internal state, which is why we use two regexes for the same string
+        // if (!placeholderTestRegex.test(content)) continue;
+        //
+        // const placeholderCaptureRegex = new RegExp(placeholderCaptureRegexString, "gm"); // Create capture regex from modified key
+        // const placeholderValueMatches = placeholderCaptureRegex.exec(content); // Get placeholder values from content
+        // if (!placeholderValueMatches) continue;
+        //
+        // const placeholderValues = placeholderValueMatches.groups;
+        // if (!placeholderValues) continue;
+        //
+        // const placeholderKeys = Object.keys(placeholderValues);
+        // let translated = value;
+        //
+        // for (const key of placeholderKeys) {
+        //   const replacement = placeholderValues[key];
+        //   translated = translated.replaceAll(`{${key}}`, replacement);
+        // }
+        //
+        // return translated;
       }
 
       return "";

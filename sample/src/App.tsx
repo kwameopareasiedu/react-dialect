@@ -57,6 +57,11 @@ function App() {
         contain interpolated values like so: {count} and a second like so:{" "}
         {name} and still be parsed by react-dialect
       </Trans>
+      <Trans>
+        React dialect can even replace the same value interpolated multiple
+        times in a string. As an example, the count is {count}, {count} and{" "}
+        {count}.
+      </Trans>
     </>
   );
 }

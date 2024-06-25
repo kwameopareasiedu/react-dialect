@@ -3,5 +3,6 @@
   "It supports interpolation like so: {count}": "il prend en charge l'interpolation comme ceci: {count}",
   "Even with long paragraph statements that get formatted into multiple lines with tools like Prettier, react-dialect just works.": "Même avec de longs paragraphes formatés en plusieurs lignes avec des outils comme Prettier, le dialecte de réaction fonctionne tout simplement.",
   "Even better, long paragraph statements that get reformatted can still contain interpolated values like so: {count} and a second like so: {name} and still be parsed by react-dialect": "Mieux encore, les instructions de paragraphe long qui sont reformatées peuvent toujours contenir des valeurs interpolées comme ceci : {count} et une seconde comme ceci : {name} et toujours être analysées par React-Dialect.",
-  "Sanity check for translations in multiple files": "Vérification de l'intégrité des traductions dans plusieurs fichiers"
+  "Sanity check for translations in multiple files": "Vérification de l'intégrité des traductions dans plusieurs fichiers",
+  "React dialect can even replace the same value interpolated multiple times in a string. As an example, the count is {count}, {count} and {count}.": "React-Dialect peut même remplacer la même valeur interpolée plusieurs fois dans une chaîne. À titre d'exemple, le nombre est {count}, {count} et {count}."
 }
