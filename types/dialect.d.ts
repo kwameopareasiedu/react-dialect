@@ -5,15 +5,6 @@ interface DialectConfig {
 }
 
 interface CliConfig {
+  $cwd: string;
   removeUnused?: boolean;
-}
-
-interface TranslationEntry {
-  key: string[];
-  type: "static" | "variable";
-}
-
-interface KeyToken {
-  type: "static" | "variable";
-  value: string;
 }

@@ -17,6 +17,12 @@ const configs = [
     plugins: [nodeResolve(), commonjs(), typescript()],
     external: ["commander"],
   },
+  {
+    input: "src/cli/generate.ts",
+    output: { file: "dist/generate.js", format: "commonjs" },
+    plugins: [nodeResolve(), commonjs(), typescript()],
+    external: ["commander"],
+  },
 ];
 
 export default configs;

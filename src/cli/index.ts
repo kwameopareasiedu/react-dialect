@@ -1,15 +1,18 @@
 import { Command } from "commander";
-import build from "./build";
+import generate from "./generate";
 
 const dialect = new Command("react-dialect");
 dialect.description("A next-gen translation library for React");
 dialect.version("0.1.0");
 
 dialect
-  .command("build")
-  .description("Build translation locales and configuration files")
-  .option("-r, --remove-unused", "Remove unused translations")
-  .action((options) => tryCatch(build(options as CliConfig)));
+  .command("generate")
+  .description("Generate translation locale files (e.g. fr.json, en.json, etc)")
+  .option("-r, --remove-unused", "Remove unused translation keys")
+  .action(async (options) => {
+    const config = { ...options, $cwd: process.cwd() };
+    await tryCatch(generate(config as CliConfig));
+  });
 
 dialect.parse(process.argv);
 
