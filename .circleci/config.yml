@@ -1,0 +1,32 @@
+# This config was automatically generated from your source code
+# Stacks detected: deps:node:.,package_manager:yarn:
+version: 2.1
+orbs:
+  node: circleci/node@5
+jobs:
+  ava-test:
+    # Install node dependencies and run tests
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          name: Run tests
+          command: yarn test --passWithNoTests
+  deploy:
+    # This is an example deploy job, not actually used by the workflow
+    docker:
+      - image: cimg/base:stable
+    steps:
+      # Replace this with steps to deploy to users
+      - run:
+          name: deploy
+          command: '#e.g. ./deploy.sh'
+workflows:
+  build-and-test:
+    jobs:
+      - ava-test
+    # - deploy:
+    #     requires:
+    #       - test-node
