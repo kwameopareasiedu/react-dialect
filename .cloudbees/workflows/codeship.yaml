@@ -1,0 +1,43 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: codeship
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    steps:
+      - uses: docker://golang:1.20.3-alpine3.17
+        name: Run tests
+        shell: sh
+        run: >-
+          # Install NVM
+
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+
+          # Install node and npm
+
+          nvm install 20.11.1
+
+          node -v
+
+          npm -v
+
+
+          # Install yarn
+
+          npm i -g yarn@1.22.22
+
+          yarn -v
+
+
+          # Install dependencies
+
+          yarn install
+
+
+          # Run tests
+
+          yarn test
