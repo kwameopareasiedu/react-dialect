@@ -12,8 +12,11 @@ jobs:
       - node/install-packages:
           pkg-manager: yarn
       - run:
+          name: Build translations generator
+          command: rollup -c
+      - run:
           name: Run tests
-          command: yarn test --passWithNoTests
+          command: yarn test
   deploy:
     # This is an example deploy job, not actually used by the workflow
     docker:
