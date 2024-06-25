@@ -108,10 +108,11 @@ function getTranslateComponentImportName(source: string) {
 }
 
 function tokenizeString(translationStr: string) {
-  let str = translationStr.trim();
-  str = str.replaceAll("\n", " "); // Replace new lines with white space
-  str = str.replaceAll(/\{"( +)?"\}/g, " "); // Replace interpolated consecutive whitespaces with a single one
-  str = str.replaceAll(/ {2,}/g, " "); // Replace consecutive whitespaces with a single one
+  const str = translationStr
+    .trim()
+    .replaceAll("\n", " ") // Replace new lines with white space
+    .replaceAll(/\{"( +)?"\}/g, " ") // Replace interpolated consecutive whitespaces with a single one
+    .replaceAll(/ {2,}/g, " "); // Replace consecutive whitespaces with a single one
 
   const tokens = [] as KeyToken[];
   let currentToken = "";
