@@ -161,8 +161,8 @@ function getHookFunctionNames(source: string) {
 
   if (usageStrings.length === 0) return null;
 
-  const destructuredAliasUsageRegex = /^{(?: ?)+translate(?: ?)+:(?: ?)+(\w+)(?: ?)+}$/; // Match "{ translate: t }" pattern
-  const destructuredUsageRegex = /^{(?: ?)+translate(?: ?)+}$/; // Match "{ translate }" pattern
+  const destructuredAliasUsageRegex = /^{.+translate(?: ?)+:(?: ?)+(\w+).+}$/; // Match "{ translate: t }" pattern
+  const destructuredUsageRegex = /^{.+translate.+}$/; // Match "{ translate }" pattern
   const variableUsageRegex = /^\w+$/; // Match un-destructured pattern
 
   return usageStrings.reduce((names, str) => {
