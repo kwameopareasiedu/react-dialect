@@ -64,21 +64,30 @@ function processDirectory(relativePath: string, cliConfig: CliConfig): Translati
 
 function processFile(absoluteFilePath: string, cliConfig: CliConfig): TranslationKey[] {
   const sourceCode = fs.readFileSync(absoluteFilePath, { encoding: "utf-8" });
-  const componentImportName = getTranslateComponentImportName(sourceCode);
-  if (!componentImportName) return []; // No import of Translate from "react-dialect"
-
-  const translationStringRegex = new RegExp(`<${componentImportName}(?:.+)??>(.+?)<\\/${componentImportName}>`, "gs");
-  const translationStringMatches = sourceCode.matchAll(translationStringRegex);
   const translationKeys: string[] = [];
 
-  for (const match of translationStringMatches) {
-    const key = match[1]
-      .trim()
-      .replaceAll("\n", " ") // Replace new lines with white space
-      .replaceAll(/\{"( +)?"\}/g, " ") // Replace interpolated consecutive whitespaces with a single one
-      .replaceAll(/ {2,}/g, " "); // Replace consecutive whitespaces with a single one
+  // Process imports statements for Translation component
+  const componentImportName = getImportedModuleName(sourceCode, "Translate");
 
-    translationKeys.push(key);
+  if (componentImportName) {
+    const translationStringRegex = new RegExp(`<${componentImportName}(?:.+)??>(.+?)<\\/${componentImportName}>`, "gs");
+    const translationStringMatches = sourceCode.matchAll(translationStringRegex);
+
+    for (const match of translationStringMatches) {
+      const key = match[1]
+        .trim()
+        .replaceAll("\n", " ") // Replace new lines with white space
+        .replaceAll(/\{"( +)?"\}/g, " ") // Replace interpolated consecutive whitespaces with a single one
+        .replaceAll(/ {2,}/g, " "); // Replace consecutive whitespaces with a single one
+
+      translationKeys.push(key);
+    }
+  }
+
+  // Process usages of useTranslation hook
+  const hookNames = getHookFunctionNames(sourceCode);
+
+  if (hookNames) {
   }
 
   // TODO: Implement check for translate function (used in side effects)
@@ -87,26 +96,26 @@ function processFile(absoluteFilePath: string, cliConfig: CliConfig): Translatio
   return translationKeys.map((key) => ({ key: key, path: relativeFilePath }));
 }
 
-function getTranslateComponentImportName(source: string) {
+function getImportedModuleName(source: string, targetModuleName: string) {
   const prettySource = source
     .split(/[\n;]/g) // Split by new line or semicolon
     .map((line) => line.trim())
     .filter((line) => !!line)
     .join("\n");
 
-  const importPatternRegex = /^import ?\{([\w \n,]+?)\} ?from ['"]react-dialect['"];?$/ms;
+  const importPatternRegex = /^import ?\{([\w \n,]+?)\} ?from ?['"]react-dialect['"];?$/ms;
   const importStringMatch = prettySource.match(importPatternRegex);
   if (!importStringMatch) return null;
 
-  const importedString = importStringMatch[1].trim();
-  const importedModuleNames = importedString.split(",").map((part) => part.trim());
+  const importedModuleString = importStringMatch[1].trim();
+  const importedModuleNames = importedModuleString.split(",").map((part) => part.trim());
 
   for (const moduleName of importedModuleNames) {
-    if (moduleName === "Translate") {
-      // Translate is imported as is
+    if (moduleName === targetModuleName) {
+      // Module is imported as is
       return moduleName;
-    } else if (moduleName.indexOf("as") !== -1) {
-      // Translate is import using an alias
+    } else if (moduleName.indexOf(targetModuleName) !== -1 && moduleName.indexOf("as") !== -1) {
+      // Module is imported using an alias
       const parts = moduleName.split("as ");
       return parts[1];
     }
@@ -115,36 +124,37 @@ function getTranslateComponentImportName(source: string) {
   return null;
 }
 
-// function tokenizeString(translationStr: string) {
-//   const str = translationStr
-//     .trim()
-//     .replaceAll("\n", " ") // Replace new lines with white space
-//     .replaceAll(/\{"( +)?"\}/g, " ") // Replace interpolated consecutive whitespaces with a single one
-//     .replaceAll(/ {2,}/g, " "); // Replace consecutive whitespaces with a single one
-//
-//   const tokens = [] as KeyToken[];
-//   let currentToken = "";
-//   let pos = 0;
-//
-//   while (pos < str.length) {
-//     const char = str[pos++];
-//
-//     if (char === "{") {
-//       tokens.push({ type: "static", value: currentToken });
-//       currentToken = char;
-//     } else if (char === "}") {
-//       currentToken += char;
-//       tokens.push({ type: "variable", value: currentToken });
-//       currentToken = "";
-//     } else currentToken += char;
-//   }
-//
-//   if (currentToken) {
-//     tokens.push({ type: "static", value: currentToken });
-//   }
-//
-//   return tokens;
-// }
+function getHookFunctionNames(source: string) {
+  const prettySource = source
+    .split(/[\n;]/g) // Split by new line or semicolon
+    .map((line) => line.trim())
+    .filter((line) => !!line)
+    .join("\n");
+
+  const hookImportName = getImportedModuleName(prettySource, "useTranslation");
+  if (!hookImportName) return null;
+
+  const usagePatternRegex = new RegExp(`^\\w+(?: ?)+(.+?)(?: ?)+=(?: ?)+${hookImportName}\\(\\);?$`, "gm"); // Match "const ___ = useTranslation();
+  const usageStrings = [] as string[];
+  let usageStringMatch: RegExpExecArray | null;
+
+  while ((usageStringMatch = usagePatternRegex.exec(prettySource)) !== null) {
+    usageStrings.push(usageStringMatch[1].trim());
+  }
+
+  if (usageStrings.length === 0) return null;
+
+  const destructuredAliasUsageRegex = /^{(?: ?)+translate(?: ?)+:(?: ?)+(\w+)(?: ?)+}$/; // Match "{ translate: t }" pattern
+  const destructuredUsageRegex = /^{(?: ?)+translate(?: ?)+}$/; // Match "{ translate }" pattern
+  const variableUsageRegex = /^\w+$/;
+
+  return usageStrings.reduce((names, str) => {
+    if (destructuredAliasUsageRegex.test(str)) return [...names, destructuredAliasUsageRegex.exec(str)![1]];
+    if (destructuredUsageRegex.test(str)) return [...names, "translate"];
+    if (variableUsageRegex.test(str)) return [...names, `${str}.translate`];
+    return names;
+  }, [] as string[]);
+}
 
 function saveTranslationEntries(keys: TranslationKey[], projectConfig: DialectConfig, cliConfig: CliConfig) {
   const localesDirPath = path.resolve(cliConfig.$cwd, "public", "locales");
@@ -163,6 +173,13 @@ function saveTranslationEntries(keys: TranslationKey[], projectConfig: DialectCo
       const existingTranslationsMap = JSON.parse(fs.readFileSync(translationsFilePath, "utf-8")) as {
         [k: string]: string;
       };
+
+      if (cliConfig.showReport) {
+        console.log(`Existing Translations: ${language}`);
+        console.log("=====================");
+        Object.keys(existingTranslationsMap).forEach((key) => console.log(key));
+        console.log("\n");
+      }
 
       // Remove keys in newTranslationKeys which exist in existingTranslationsMap
       for (const translationKey of keys) {

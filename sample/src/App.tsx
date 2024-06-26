@@ -1,13 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
-import { SwitchLanguage, Translate as Trans } from "react-dialect";
+import {
+  SwitchLanguage,
+  Translate as Trans,
+  useTranslation,
+} from "react-dialect";
 import "./App.css";
 import { randFullName } from "@ngneat/falso";
 
 function App() {
   const [count, setCount] = useState(0);
   const [name, setName] = useState(randFullName());
+  const { translate: t } = useTranslation();
+  const { translate } = useTranslation();
+  const translator = useTranslation();
+  const translator2 = useTranslator();
+
+  useEffect(() => {
+    console.log(t("Use the translate function for side-effects"));
+  }, []);
 
   return (
     <>
