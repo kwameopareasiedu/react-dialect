@@ -1,14 +1,13 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
-import { Translate as Trans, useTranslation } from "react-dialect";
+import { SwitchLanguage, Translate as Trans } from "react-dialect";
 import "./App.css";
 import { randFullName } from "@ngneat/falso";
 
 function App() {
   const [count, setCount] = useState(0);
   const [name, setName] = useState(randFullName());
-  const { setCurrentLanguage } = useTranslation();
 
   return (
     <>
@@ -40,11 +39,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
 
-      <div className="flex items-center justify-between gap-8">
-        <button onClick={() => setCurrentLanguage("en")}>En</button>
-        <button onClick={() => setCurrentLanguage("fr")}>Fr</button>
-        <button onClick={() => setCurrentLanguage("ge")}>Ge</button>
-      </div>
+      <SwitchLanguage />
 
       <Trans>Next gen translation library</Trans>
       <Trans>It supports interpolation like so: {count}</Trans>
