@@ -9,6 +9,7 @@ dialect
   .command("generate")
   .description("Generate translation locale files (e.g. fr.json, en.json, etc)")
   .option("-r, --remove-unused", "Remove unused translation keys")
+  .option("-s, --show-report", "Display a report on new and existing keys")
   .action(async (options) => {
     const config = { ...options, $cwd: process.cwd() };
     await tryCatch(generate(config as CliConfig));

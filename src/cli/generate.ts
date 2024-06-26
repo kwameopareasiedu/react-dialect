@@ -10,7 +10,7 @@ export default async function generate(cliConfig: CliConfig) {
 
   const keys = projectConfig.content.reduce((keys, root) => {
     return [...keys, ...processDirectory(root, cliConfig)];
-  }, [] as string[]);
+  }, [] as TranslationKey[]);
 
   saveTranslationEntries(keys, projectConfig, cliConfig);
 }
@@ -35,7 +35,7 @@ function parseConfigFile(cliConfig: CliConfig): DialectConfig {
   return config;
 }
 
-function processDirectory(relativePath: string, cliConfig: CliConfig): string[] {
+function processDirectory(relativePath: string, cliConfig: CliConfig): TranslationKey[] {
   const dirPath = path.resolve(cliConfig.$cwd, relativePath);
   if (!fs.existsSync(dirPath)) throw `"${dirPath}" does not exist`;
   if (!fs.lstatSync(dirPath).isDirectory()) throw `"${dirPath}" is not a directory`;
@@ -44,12 +44,12 @@ function processDirectory(relativePath: string, cliConfig: CliConfig): string[] 
   const dirDirents = dirents.filter((d) => d.isDirectory());
   const fileDirents = dirents.filter((d) => d.isFile() && SUPPORTED_EXTENSIONS.includes(path.extname(d.name)));
 
-  const translationKeys: string[] = [];
+  const translationKeys: TranslationKey[] = [];
 
   for (const dirent of fileDirents) {
     const parentPath = dirent.parentPath ?? dirent.path;
     const absolutePath = path.resolve(parentPath, dirent.name);
-    translationKeys.push(...processFile(absolutePath));
+    translationKeys.push(...processFile(absolutePath, cliConfig));
   }
 
   for (const dirent of dirDirents) {
@@ -62,7 +62,7 @@ function processDirectory(relativePath: string, cliConfig: CliConfig): string[] 
   return translationKeys;
 }
 
-function processFile(absoluteFilePath: string): string[] {
+function processFile(absoluteFilePath: string, cliConfig: CliConfig): TranslationKey[] {
   const sourceCode = fs.readFileSync(absoluteFilePath, { encoding: "utf-8" });
   const componentImportName = getTranslateComponentImportName(sourceCode);
   if (!componentImportName) return []; // No import of Translate from "react-dialect"
@@ -83,7 +83,8 @@ function processFile(absoluteFilePath: string): string[] {
 
   // TODO: Implement check for translate function (used in side effects)
 
-  return translationKeys;
+  const relativeFilePath = path.relative(cliConfig.$cwd, absoluteFilePath);
+  return translationKeys.map((key) => ({ key: key, path: relativeFilePath }));
 }
 
 function getTranslateComponentImportName(source: string) {
@@ -145,32 +146,41 @@ function getTranslateComponentImportName(source: string) {
 //   return tokens;
 // }
 
-function saveTranslationEntries(keys: string[], projectConfig: DialectConfig, cliConfig: CliConfig) {
+function saveTranslationEntries(keys: TranslationKey[], projectConfig: DialectConfig, cliConfig: CliConfig) {
   const localesDirPath = path.resolve(cliConfig.$cwd, "public", "locales");
   if (!fs.existsSync(localesDirPath)) fs.mkdirSync(localesDirPath, { recursive: true });
 
   const targetLanguages = projectConfig.languages.filter((lang) => lang !== projectConfig.baseLanguage);
+  const foundTranslationsMap = keys.reduce((map, key) => ({ ...map, [key.key]: "" }), {});
+  const newTranslationKeys = [...keys]; // Start with found keys
 
   for (const language of targetLanguages) {
     const translationsFilePath = path.resolve(localesDirPath, `${language}.json`);
-    const newTranslationsMap = keys.reduce((map, key) => ({ ...map, [key]: "" }), {});
 
     if (!fs.existsSync(translationsFilePath)) {
-      fs.writeFileSync(translationsFilePath, JSON.stringify(newTranslationsMap, null, 2));
+      fs.writeFileSync(translationsFilePath, JSON.stringify(foundTranslationsMap, null, 2));
     } else {
       const existingTranslationsMap = JSON.parse(fs.readFileSync(translationsFilePath, "utf-8")) as {
         [k: string]: string;
       };
 
-      const mergedTranslationsMap = Object.keys(newTranslationsMap).reduce((map, key) => {
+      // Remove keys in newTranslationKeys which exist in existingTranslationsMap
+      for (const translationKey of keys) {
+        if (Object.keys(existingTranslationsMap).includes(translationKey.key)) {
+          const removeIdx = newTranslationKeys.indexOf(translationKey);
+          if (removeIdx !== -1) newTranslationKeys.splice(removeIdx, 1);
+        }
+      }
+
+      const mergedTranslationsMap = Object.keys(foundTranslationsMap).reduce((map, key) => {
         if (!map[key]) {
-          return { ...map, [key]: newTranslationsMap[key] };
+          return { ...map, [key]: foundTranslationsMap[key] };
         } else return map;
       }, existingTranslationsMap);
 
       if (cliConfig.removeUnused) {
         const mergedKeys = Object.keys(mergedTranslationsMap);
-        const newKeys = Object.keys(newTranslationsMap);
+        const newKeys = Object.keys(foundTranslationsMap);
 
         for (const key of mergedKeys) {
           if (!newKeys.includes(key)) {
@@ -181,5 +191,14 @@ function saveTranslationEntries(keys: string[], projectConfig: DialectConfig, cl
 
       fs.writeFileSync(translationsFilePath, JSON.stringify(mergedTranslationsMap, null, 2));
     }
+  }
+
+  if (cliConfig.showReport) {
+    console.log(`New Translation Keys: ${newTranslationKeys.length}`);
+    console.log("====================");
+
+    if (newTranslationKeys.length > 0) {
+      newTranslationKeys.forEach((key) => console.log(`Found "${key.key}" in "${key.path}"`));
+    } else console.log("N/A");
   }
 }

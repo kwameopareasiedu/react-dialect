@@ -7,4 +7,10 @@ interface DialectConfig {
 interface CliConfig {
   $cwd: string;
   removeUnused?: boolean;
+  showReport?: boolean;
+}
+
+interface TranslationKey {
+  key: string;
+  path: string;
 }

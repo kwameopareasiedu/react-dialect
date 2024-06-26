@@ -156,7 +156,7 @@ Congratulations! You've successfully integrated `react-dialect` into your workfl
   - [ ] Parse instances of `translate` function, whether used with default name or destructured with an alias
   - [x] Merge new keys into existing translations files ✅
   - [x] Optionally remove unused keys (I.e. keys not found in source code) with `--remove-unused` flag ✅
-  - [ ] Optionally display a report of new keys found and existing keys with `--show-report` flag
+  - [x] Optionally display a report of new keys found along with their file paths with `--show-report` flag ✅
 - [ ] Implement a customizable `SwitchLanguage` component
 - [ ] Implement JSX parsing in `Translate` component
 - [ ] Generate appropriate type declarations
