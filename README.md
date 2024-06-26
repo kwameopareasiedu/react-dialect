@@ -151,15 +151,15 @@ Congratulations! You've successfully integrated `react-dialect` into your workfl
 ## Roadmap
 
 - [x] Implement a **strongly typed** polymorphic `Translate` component to replace text tags ✅
-- [ ] Implement a CLI to statically analyze source code and generate translation keys ✅
+- [ ] Implement a CLI to statically analyze source code and generate translation keys
   - [x] Parse instances of `<Translate>` component, whether imported as default or with an alias ✅
   - [ ] Parse instances of `translate` function, whether used with default name or destructured with an alias
   - [x] Merge new keys into existing translations files ✅
   - [x] Optionally remove unused keys (I.e. keys not found in source code) with `--remove-unused` flag ✅
   - [x] Optionally display a report of new keys found along with their file paths with `--show-report` flag ✅
-- [ ] Implement a customizable `SwitchLanguage` component
+- [x] Implement a customizable `SwitchLanguage` component ✅
 - [ ] Implement JSX parsing in `Translate` component
-- [ ] Generate appropriate type declarations
+- [x] Generate appropriate type declarations ✅
 - [ ] Provide a service to get values for translation keys
 
 ## Contributors
