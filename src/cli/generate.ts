@@ -12,7 +12,7 @@ export default async function generate(cliConfig: CliConfig) {
     return [...keys, ...processDirectory(root, cliConfig)];
   }, [] as TranslationKey[]);
 
-  saveTranslationEntries(keys, projectConfig, cliConfig);
+  saveTranslationKeys(keys, projectConfig, cliConfig);
 }
 
 function parseConfigFile(cliConfig: CliConfig): DialectConfig {
@@ -49,7 +49,7 @@ function processDirectory(relativePath: string, cliConfig: CliConfig): Translati
   for (const dirent of fileDirents) {
     const parentPath = dirent.parentPath ?? dirent.path;
     const absolutePath = path.resolve(parentPath, dirent.name);
-    translationKeys.push(...processFile(absolutePath, cliConfig));
+    translationKeys.push(...parseFile(absolutePath, cliConfig));
   }
 
   for (const dirent of dirDirents) {
@@ -62,7 +62,7 @@ function processDirectory(relativePath: string, cliConfig: CliConfig): Translati
   return translationKeys;
 }
 
-function processFile(absoluteFilePath: string, cliConfig: CliConfig): TranslationKey[] {
+function parseFile(absoluteFilePath: string, cliConfig: CliConfig): TranslationKey[] {
   const sourceCode = fs.readFileSync(absoluteFilePath, { encoding: "utf-8" });
   const translationKeys: string[] = [];
 
@@ -70,6 +70,7 @@ function processFile(absoluteFilePath: string, cliConfig: CliConfig): Translatio
   const componentImportName = getImportedModuleName(sourceCode, "Translate");
 
   if (componentImportName) {
+    // Match the children of component imports (I.e. `<componentImportName>{TARGET}</componentImportName>`)
     const translationStringRegex = new RegExp(`<${componentImportName}(?:.+)??>(.+?)<\\/${componentImportName}>`, "gs");
     const translationStringMatches = sourceCode.matchAll(translationStringRegex);
 
@@ -85,12 +86,28 @@ function processFile(absoluteFilePath: string, cliConfig: CliConfig): Translatio
   }
 
   // Process usages of useTranslation hook
-  const hookNames = getHookFunctionNames(sourceCode);
+  const hookFunctionNames = getHookFunctionNames(sourceCode);
 
-  if (hookNames) {
+  if (hookFunctionNames) {
+    for (const hookFunctionName of hookFunctionNames) {
+      // Match the children of hook function (I.e. `hookFunctionName(TARGET)`)
+      const translationStringRegex = new RegExp(
+        `${hookFunctionName}\\((?:[\n ]+?)?["'\`](.+?)['"\`],?(?:[\n ]+?)?\\);?`,
+        "gms",
+      );
+      const translationStringMatches = sourceCode.matchAll(translationStringRegex);
+
+      for (const match of translationStringMatches) {
+        const key = match[1]
+          .trim()
+          .replaceAll("\n", " ") // Replace new lines with white space
+          .replaceAll(/ {2,}/g, " ") // Replace consecutive whitespaces with a single one
+          .replaceAll(/\$({\w+})/g, "$1"); // Replace "${name}" with "{name}"
+
+        translationKeys.push(key);
+      }
+    }
   }
-
-  // TODO: Implement check for translate function (used in side effects)
 
   const relativeFilePath = path.relative(cliConfig.$cwd, absoluteFilePath);
   return translationKeys.map((key) => ({ key: key, path: relativeFilePath }));
@@ -146,7 +163,7 @@ function getHookFunctionNames(source: string) {
 
   const destructuredAliasUsageRegex = /^{(?: ?)+translate(?: ?)+:(?: ?)+(\w+)(?: ?)+}$/; // Match "{ translate: t }" pattern
   const destructuredUsageRegex = /^{(?: ?)+translate(?: ?)+}$/; // Match "{ translate }" pattern
-  const variableUsageRegex = /^\w+$/;
+  const variableUsageRegex = /^\w+$/; // Match un-destructured pattern
 
   return usageStrings.reduce((names, str) => {
     if (destructuredAliasUsageRegex.test(str)) return [...names, destructuredAliasUsageRegex.exec(str)![1]];
@@ -156,7 +173,7 @@ function getHookFunctionNames(source: string) {
   }, [] as string[]);
 }
 
-function saveTranslationEntries(keys: TranslationKey[], projectConfig: DialectConfig, cliConfig: CliConfig) {
+function saveTranslationKeys(keys: TranslationKey[], projectConfig: DialectConfig, cliConfig: CliConfig) {
   const localesDirPath = path.resolve(cliConfig.$cwd, "public", "locales");
   if (!fs.existsSync(localesDirPath)) fs.mkdirSync(localesDirPath, { recursive: true });
 

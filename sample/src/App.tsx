@@ -12,14 +12,27 @@ import { randFullName } from "@ngneat/falso";
 function App() {
   const [count, setCount] = useState(0);
   const [name, setName] = useState(randFullName());
-  const { translate: t } = useTranslation();
+  const { translate: t, currentLanguage } = useTranslation();
   const { translate } = useTranslation();
   const translator = useTranslation();
-  const translator2 = useTranslator();
 
   useEffect(() => {
-    console.log(t("Use the translate function for side-effects"));
-  }, []);
+    console.log(
+      translator.translate("Use the translate function for side-effects"),
+    );
+
+    console.log(
+      translate(
+        "The translate function from the hook can be destructured and it still works",
+      ),
+    );
+
+    console.log(
+      t(
+        `The translate function from the hook can even be destructured as an alias and it still works even with interpolated values like ${name} and ${count}. Just be prepared for long translation keys`,
+      ),
+    );
+  }, [currentLanguage]);
 
   return (
     <>
