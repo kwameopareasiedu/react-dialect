@@ -59,7 +59,7 @@ _**Code with react-i18next**_
 ```bash
 # Generate translation keys for specified languages (E.g. en.json, fr.json, etc)
 # If translation files for languages already exist, new keys are merged into them
-react-dialect generate
+npx react-dialect generate
 ```
 
 ## Motivation & Goals
@@ -83,11 +83,69 @@ I wanted an i18n solution where:
 
 ## Features
 
-- Intuitive looking JSX in the base language
-- Automatic generation of translation keys using `react-dialect generate`
-  - Optionally remove unused translation keys to reduce bloat
-- Variable interpolation works out of the box with no gimmicks
-- Lazy loading of translation files to prevent large bundle sizes
+### Intuitive Translate Tags
+
+Use natural language in the `Translate` tags without the overhead of managing and looking up values for keys.
+The `Translate` component is polymorphic meaning its props are control by the value of the `as` prop
+
+```typescript jsx
+// Natually written JSX strings ✅
+<Translate as="p">I love react-dialect</Translate>
+<Translate as={Link} to="/profile">Go to profile</Translate>
+
+// Not function calling with keys ❌
+<p>{t("loveForReactDialect")}</p>
+<Link to="/profile">{t("goToProfile")}</Link>
+```
+
+### Automatic Translation Keys Generation
+
+`React-dialect` comes with a CLI function which analyzes your source code, looking for instances of the
+`<Translate></Translate>` component and the `translate()` hook function. From these, it generates translation keys
+automatically and writes them to your translation files, located in `/public/locales`.
+
+- Use the `--remove-unused` flag to remove translation keys which don't exist in your source code anymore
+- Use the `--show-report` flag to output new translation keys found after execution
+
+```shell
+npx react-dialect generate #or
+npx react-dialect generate --remove-unused #or
+npx react-dialect generate --show-report
+```
+
+> _Multiline code strings are converted to single line strings, so using Prettier to format your code isn't an issue._
+
+### Seamless Variable Interpolation
+
+Want to insert values into your translations? **The same JSX syntax just works** with no extra effort!
+
+```typescript jsx
+const [name, setName] = useState("Kwame Opare Asiedu");
+const [year, setYear] = useState(2024);
+// Ommited component code
+<Translate>My name is {name} and the year is {year}</Translate> // It just works!
+```
+
+During generation, `react-dialect` includes variable placeholders in the translation keys. Just use the same
+placeholders in the translations and you are good to go. The translation key-value pair for the example above for
+French would be:
+
+```json
+{
+  "My name is {name} and the year is {year}": "Je m'appelle {name} et l'année est {year}"
+}
+```
+
+### Lazy Loading Of Translations
+
+`React-dialect` will only fetch the translation file for a language when it is first chosen either by the
+`SwitchLanguage` component of the `setCurrentLanguage()` hook function. The translations are cached in memory and are
+not re-fetched anytime the language is selected.
+
+This gives the following benefits:
+
+1. Translation files are not bundled with your application's source code hence keeping your bundles small.
+2. **Zero** load times for base translations, since those are the children of the `Translate` components.
 
 ## Quickstart
 
@@ -127,7 +185,6 @@ _Actually, this is all you need to do even for a production app_
    const name = "Kwame Opare Asiedu";
 
    export default function Sub() {
-
       return (
          <div>
           <SwitchLanguage className="absolute top-4 left-4"/>
@@ -158,9 +215,9 @@ Congratulations! You've successfully integrated `react-dialect` into your workfl
   - [x] Optionally remove unused keys (I.e. keys not found in source code) with `--remove-unused` flag ✅
   - [x] Optionally display a report of new keys found along with their file paths with `--show-report` flag ✅
 - [x] Implement a customizable `SwitchLanguage` component ✅
-- [ ] Implement JSX parsing in `Translate` component
 - [x] Generate appropriate type declarations ✅
-- [ ] Provide a service to get values for translation keys
+- [ ] Implement JSX parsing in `Translate` component (Coming soon)
+- [ ] Provide a service to get values for translation keys (Coming soon)
 
 ## Contributors
 
