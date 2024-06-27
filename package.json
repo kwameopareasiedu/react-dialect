@@ -1,13 +1,19 @@
 {
   "name": "react-dialect",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Kwame Opare Asiedu",
   "description": "A next-gen translation library for React",
-  "repository": "https://github.com/kwameopareasiedu/react-dialect",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:kwameopareasiedu/react-dialect.git"
+  },
   "homepage": "https://github.com/kwameopareasiedu/react-dialect#readme",
   "license": "MIT",
   "main": "dist/lib.js",
   "typings": "dist/lib.d.ts",
+  "bin": {
+    "react-dialect": "dist/cli.js"
+  },
   "scripts": {
     "dev": "rollup --config --watch",
     "test": "ava"
@@ -41,5 +47,18 @@
   },
   "engines": {
     "node": "^20.11.1"
-  }
+  },
+  "keywords": [
+    "react",
+    "dialect",
+    "i18n",
+    "intl",
+    "internationalization",
+    "l10n",
+    "locale",
+    "localization",
+    "globalization",
+    "translate",
+    "translation"
+  ]
 }

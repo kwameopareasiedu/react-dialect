@@ -108,8 +108,10 @@ automatically and writes them to your translation files, located in `/public/loc
 - Use the `--show-report` flag to output new translation keys found after execution
 
 ```shell
-npx react-dialect generate #or
-npx react-dialect generate --remove-unused #or
+npx react-dialect generate
+#or
+npx react-dialect generate --remove-unused
+#or
 npx react-dialect generate --show-report
 ```
 
