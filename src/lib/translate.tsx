@@ -1,9 +1,11 @@
 import React, { Children, ComponentPropsWithoutRef, ElementType, useMemo } from "react";
 import { useTranslation } from "@/lib/translation-provider";
 
+type Primitive = string | number | boolean;
+
 type TranslateProps<T extends ElementType> = {
   as?: T;
-  children: string;
+  children: string | Primitive[];
 } & ComponentPropsWithoutRef<T>;
 
 export function Translate<T extends ElementType = "p">({ as, children, ...rest }: TranslateProps<T>) {
