@@ -2,7 +2,10 @@
 
 A next-gen internationalization (i18n) library for React with minimal configuration.
 
-[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/FMBebRNnfb6DvNimhnN8hn/B12wdgBr28egU2dW897acs/tree/master.svg?style=svg&circle-token=CCIPRJ_Uj9rEgMxqL9qmCdG9NBRHu_70f14e002a2479d29d163bea1e256d08f5eee7cb)](https://dl.circleci.com/status-badge/redirect/circleci/FMBebRNnfb6DvNimhnN8hn/B12wdgBr28egU2dW897acs/tree/master)
+[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/FMBebRNnfb6DvNimhnN8hn/B12wdgBr28egU2dW897acs/tree/master.svg?style=svg&circle-token=CCIPRJ_Uj9rEgMxqL9qmCdG9NBRHu_70f14e002a2479d29d163bea1e256d08f5eee7cb)](https://dl.circleci.com/status-badge/redirect/circleci/FMBebRNnfb6DvNimhnN8hn/B12wdgBr28egU2dW897acs/tree/master) 
+![License](https://img.shields.io/badge/License-MIT-orange)
+![Size](https://img.shields.io/badge/Unpacked_Size-30kB-blue)
+[![Static Badge](https://img.shields.io/badge/Buy_Me_A_Coffee-yellow?style=flat&logo=buymeacoffee&labelColor=orange&color=orange)](https://www.buymeacoffee.com/kwameopareasiedu)
 
 ## Installation
 
@@ -220,6 +223,12 @@ Congratulations! You've successfully integrated `react-dialect` into your workfl
 - [x] Generate appropriate type declarations ✅
 - [ ] Implement JSX parsing in `Translate` component (Coming soon)
 - [ ] Provide a service to get values for translation keys (Coming soon)
+
+## Supporting
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/kwameopareasiedu)
+
+Your support would mean so much and keep the motivation going. Thanks 🤗
 
 ## Contributors
 
