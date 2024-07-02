@@ -1,6 +1,6 @@
 {
   "name": "react-dialect",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Kwame Opare Asiedu",
   "description": "A next-gen translation library for React",
   "repository": {
@@ -16,6 +16,7 @@
   },
   "scripts": {
     "dev": "rollup --config --watch",
+    "build": "rollup --config",
     "test": "ava"
   },
   "devDependencies": {
