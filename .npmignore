@@ -4,6 +4,7 @@
 dist/generate.js
 node_modules
 sample
+landing
 src
 temp
 types
