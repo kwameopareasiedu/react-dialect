@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   node: circleci/node@5
 jobs:
-  build:
+  build-test-publish:
     executor: node/default
     steps:
       - checkout
@@ -11,33 +11,20 @@ jobs:
       - run:
           name: Build files
           command: yarn build
-  ava-test:
-    executor: node/default
-    steps:
       - run:
           name: Run tests
           command: yarn test
-  npm-publish:
-    executor: node/default
-    steps:
-      - run:
-          name: Set NPM auth token
-          command: npm set //registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN
-      - run:
-          name: Publish to NPM
-          command: npm publish --dry-run
+      - when:
+          condition:
+            equal: ["publish", <<pipeline.git.branch>>]
+          steps:
+            - run:
+                name: Set NPM auth token
+                command: npm set //registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN
+            - run:
+                name: Publish to NPM
+                command: npm publish --dry-run
 workflows:
   build-test-publish:
     jobs:
-      - build
-      - ava-test:
-          requires:
-            - build
-      - npm-publish: #Only run when pushed to "publish" branch
-          requires:
-            - build
-            - ava-test
-          filters:
-            branches:
-              only:
-                - publish
+      - build-test-publish
