@@ -29,6 +29,7 @@ jobs:
 workflows:
   build-test-publish:
     jobs:
+      - build
       - ava-test:
           requires:
             - build
