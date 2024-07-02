@@ -9,12 +9,26 @@ function App() {
             React Dialect | <span className="font-mono">v0.1.0</span>
           </p>
 
-          <a
-            href="https://github.com/kwameopareasiedu/react-dialect"
-            className="flex items-center gap-2 border-2 border-gray-600 px-2 py-1 rounded-lg">
-            <FaGithub className="fill-white" />
-            <p className="font-medium text-sm text-gray-400">Github Repository</p>
-          </a>
+          <div className="flex items-center gap-2">
+            <a
+              href="https://github.com/kwameopareasiedu/react-dialect"
+              className="flex items-center gap-2 border-2 border-gray-600 px-2 py-1 rounded-lg"
+              target="_blank">
+              <FaGithub className="fill-white" />
+              <p className="font-medium text-sm text-gray-400">Github Repository</p>
+            </a>
+
+            <a
+              href="https://www.buymeacoffee.com/kwameopareasiedu"
+              className="inline-flex items-center gap-2 rounded-lg h-8"
+              target="_blank">
+              <img
+                src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png"
+                className="w-full h-full object-contain"
+                alt="buymeacoffee"
+              />
+            </a>
+          </div>
         </div>
       </header>
 
