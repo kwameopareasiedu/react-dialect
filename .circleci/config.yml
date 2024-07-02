@@ -1,35 +1,42 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:.,package_manager:yarn:
 version: 2.1
 orbs:
   node: circleci/node@5
 jobs:
-  ava-test:
-    # Install node dependencies and run tests
+  build:
     executor: node/default
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: yarn
       - run:
-          name: Build translations generator
-          command: node_modules/.bin/rollup -c
+          name: Build files
+          command: yarn build
+  ava-test:
+    executor: node/default
+    steps:
       - run:
           name: Run tests
           command: yarn test
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
+  npm-publish:
+    executor: node/default
     steps:
-      # Replace this with steps to deploy to users
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: Set NPM auth token
+          command: npm set //registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN
+      - run:
+          name: Publish to NPM
+          command: npm publish --dry-run
 workflows:
-  build-and-test:
+  build-test-publish:
     jobs:
-      - ava-test
-    # - deploy:
-    #     requires:
-    #       - test-node
+      - ava-test:
+          requires:
+            - build
+      - npm-publish: #Only run when pushed to "publish" branch
+          requires:
+            - build
+            - ava-test
+          filters:
+            branches:
+              only:
+                - publish
