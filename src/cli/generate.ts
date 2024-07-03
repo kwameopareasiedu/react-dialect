@@ -2,6 +2,7 @@
 
 import * as path from "path";
 import * as fs from "fs";
+import { configFileName } from "@/cli/config";
 
 const SUPPORTED_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx"];
 
@@ -16,7 +17,6 @@ export default async function generate(cliConfig: CliConfig) {
 }
 
 function parseConfigFile(cliConfig: CliConfig): DialectConfig {
-  const configFileName = "dialect.config.json";
   const configFilePath = path.resolve(cliConfig.$cwd, configFileName);
   if (!fs.existsSync(configFilePath)) throw `missing "${configFileName}"`;
 

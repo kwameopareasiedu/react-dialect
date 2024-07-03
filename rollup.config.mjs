@@ -26,6 +26,12 @@ const configs = [
     external: ["commander"],
   },
   {
+    input: "src/cli/init.ts",
+    output: { file: "dist/init.js", format: "commonjs" },
+    plugins: [nodeResolve(), commonjs(), typescript()],
+    external: ["commander"],
+  },
+  {
     input: "src/cli/generate.ts",
     output: { file: "dist/generate.js", format: "commonjs" },
     plugins: [nodeResolve(), commonjs(), typescript()],

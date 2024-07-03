@@ -1,9 +1,18 @@
 import { Command } from "commander";
-import generate from "./generate";
+import generate from "@/cli/generate";
+import init from "@/cli/init";
 
 const dialect = new Command("react-dialect");
 dialect.description("A next-gen translation library for React");
 dialect.version("0.1.0");
+
+dialect
+  .command("init")
+  .description("Initialize dialect.config.json")
+  .action(async () => {
+    const config = { $cwd: process.cwd() };
+    await tryCatch(init(config));
+  });
 
 dialect
   .command("generate")

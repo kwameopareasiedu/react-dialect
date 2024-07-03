@@ -236,5 +236,7 @@ Your support would mean so much and keep the motivation going. Thanks 🤗
 
 ## Changelog
 
+- `0.5.0`
+  - Added `init` CLI command which creates the `dialect.config.json`
 - `0.4.0`
   - Added shebang header to CLI for use with `npx`

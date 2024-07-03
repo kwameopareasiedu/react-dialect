@@ -6,7 +6,7 @@ function App() {
       <header className="fixed top-0 left-0 w-full z-10 border-b-[0.5px] border-b-gray-600 md:border-none">
         <div className="container flex flex-col md:flex-row items-center justify-between py-4 gap-2">
           <p className="font-medium text-sm text-gray-400 tracking-wider">
-            React Dialect | <span className="font-mono">v0.4.0</span>
+            React Dialect | <span className="font-mono">v0.5.0</span>
           </p>
 
           <div className="flex items-center gap-2">
