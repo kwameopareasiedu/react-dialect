@@ -25,10 +25,11 @@ jobs:
                 name: Publish to NPM
                 command: npm publish
       - run:
-          name: Install landing project dependencies
+          name: Build landing project
           command: |
             cd landing
             yarn install
+            yarn build
       - run:
           name: Deploy landing project to Firebase
           command: |
