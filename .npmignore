@@ -2,6 +2,7 @@
 .github
 .idea
 dist/generate.js
+dist/init.js
 node_modules
 sample
 landing

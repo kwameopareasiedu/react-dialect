@@ -5,9 +5,9 @@
   "description": "A next-gen translation library for React",
   "repository": {
     "type": "git",
-    "url": "git@github.com:kwameopareasiedu/react-dialect.git"
+    "url": "git+ssh://git@github.com/kwameopareasiedu/react-dialect.git"
   },
-  "homepage": "https://github.com/kwameopareasiedu/react-dialect#readme",
+  "homepage": "https://react-dialect.kwameopare.dev",
   "license": "MIT",
   "main": "dist/lib.js",
   "typings": "dist/lib.d.ts",
