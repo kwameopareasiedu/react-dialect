@@ -24,6 +24,14 @@ jobs:
             - run:
                 name: Publish to NPM
                 command: npm publish
+      - run:
+          name: Load Firebase Hosting service account key
+          command: |
+            echo $FIREBASE_HOSTING_KEY_JSON>credentials.json
+            GOOGLE_APPLICATION_CREDENTIALS=credentials.json
+      - run:
+          name: Deploy to Firebase
+          command: cd landing && firebase deploy
 workflows:
   build-test-publish:
     jobs:
