@@ -1,13 +1,40 @@
 import { FaGithub } from "react-icons/fa6";
+import { useEffect, useState } from "react";
+import { CgSpinnerTwo } from "react-icons/cg";
+
+interface PackageStats {
+  version: string;
+}
 
 function App() {
+  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState<PackageStats | null>(null);
+
+  const fetchPackageStats = () => {
+    fetch("https://raw.githubusercontent.com/kwameopareasiedu/react-dialect/master/package.json", { method: "GET" })
+      .then((resp) => resp.json())
+      .then((data) => setStats({ version: data.version }))
+      .finally(() => setLoading(false));
+    setLoading(true);
+  };
+
+  useEffect(fetchPackageStats, []);
+
   return (
     <div className="w-full bg-gradient-to-br from-gray-900 to-gray-700 text-white">
       <header className="fixed top-0 left-0 w-full z-10 border-b-[0.5px] border-b-gray-600 md:border-none">
         <div className="container flex flex-col md:flex-row items-center justify-between py-4 gap-2">
-          <p className="font-medium text-sm text-gray-400 tracking-wider">
-            React Dialect | <span className="font-mono">v0.5.0</span>
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-sm text-gray-400 tracking-wider">React Dialect</p>
+
+            <span className="font-medium text-sm text-gray-400">|</span>
+
+            {loading ? (
+              <CgSpinnerTwo className="inline animate-spin" />
+            ) : (
+              <span className="font-medium text-sm text-gray-400 font-mono">v{stats?.version}</span>
+            )}
+          </div>
 
           <div className="flex items-center gap-2">
             <a

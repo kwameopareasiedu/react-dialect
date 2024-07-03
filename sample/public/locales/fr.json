@@ -7,5 +7,6 @@
   "React dialect can even replace the same value interpolated multiple times in a string. As an example, the count is {count}, {count} and {count}.": "React-Dialect peut même remplacer la même valeur interpolée plusieurs fois dans une chaîne. À titre d'exemple, le nombre est {count}, {count} et {count}.",
   "The translate function from the hook can even be destructured as an alias and it still works even with interpolated values like {name} and {count}. Just be prepared for long translation keys": "La fonction de traduction du hook peut même être déstructurée en tant qu'alias et elle fonctionne toujours même avec des valeurs interpolées telles que {name} et {count}. Préparez-vous simplement aux longues clés de traduction",
   "Use the translate function for side-effects": "Utilisez la fonction de traduction pour les effets secondaires",
-  "The translate function from the hook can be destructured and it still works": "La fonction de traduction du hook peut être déstructurée et elle fonctionne toujours"
+  "The translate function from the hook can be destructured and it still works": "La fonction de traduction du hook peut être déstructurée et elle fonctionne toujours",
+  "Vite + React": "Vite + React"
 }
