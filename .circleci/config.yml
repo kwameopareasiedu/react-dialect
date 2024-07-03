@@ -30,11 +30,10 @@ jobs:
             cd landing
             yarn install
       - run:
-          name: Deploy landing project to Firebase
+          name: Load Firebase Hosting service account key
           command: |
             echo $FIREBASE_HOSTING_KEY_JSON>credentials.json
-            GOOGLE_APPLICATION_CREDENTIALS=credentials.json
-            npx firebase deploy
+            GOOGLE_APPLICATION_CREDENTIALS=credentials.json npx firebase deploy
 workflows:
   build-test-publish:
     jobs:
