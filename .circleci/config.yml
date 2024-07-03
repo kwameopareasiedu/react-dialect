@@ -34,7 +34,7 @@ jobs:
           command: |
             echo $FIREBASE_HOSTING_KEY_JSON>credentials.json
             GOOGLE_APPLICATION_CREDENTIALS=credentials.json
-            firebase deploy
+            npx firebase deploy
 workflows:
   build-test-publish:
     jobs:
