@@ -1,6 +1,6 @@
 {
   "name": "react-dialect",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "Kwame Opare Asiedu",
   "description": "A next-gen translation library for React",
   "repository": {
@@ -19,6 +19,9 @@
     "build": "rollup --config",
     "test": "ava"
   },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.7",
@@ -32,13 +35,13 @@
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
     "ava": "^6.1.3",
-    "commander": "^12.1.0",
     "eslint": "8.57.0",
     "eslint-plugin-react": "^7.34.3",
     "prettier": "3.3.2",
     "react": "^18.3.1",
     "recast": "^0.23.9",
     "rollup": "^4.18.0",
+    "rollup-plugin-add-shebang": "^0.3.1",
     "rollup-plugin-dts": "^6.1.1",
     "tslib": "^2.6.3",
     "typescript": "^5.4.5"
