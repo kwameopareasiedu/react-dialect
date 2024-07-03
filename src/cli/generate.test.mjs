@@ -114,7 +114,9 @@ test.before(() => {
 });
 
 test.after.always(() => {
-  fs.rmSync(PROJECT_ROOT, { recursive: true });
+  if (fs.existsSync(PROJECT_ROOT)) {
+    fs.rmSync(PROJECT_ROOT, { recursive: true });
+  }
 });
 
 test("generates translations correctly", async (t) => {
