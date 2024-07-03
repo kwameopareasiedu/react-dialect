@@ -71,7 +71,10 @@ function parseFile(absoluteFilePath: string, cliConfig: CliConfig): TranslationK
 
   if (componentImportName) {
     // Match the children of component imports (I.e. `<componentImportName>{TARGET}</componentImportName>`)
-    const translationStringRegex = new RegExp(`<${componentImportName}(?:.+)??>(.+?)<\\/${componentImportName}>`, "gs");
+    const translationStringRegex = new RegExp(
+      `<${componentImportName}(?:.+?)??>(.+?)<\\/${componentImportName}>`,
+      "gs",
+    );
     const translationStringMatches = sourceCode.matchAll(translationStringRegex);
 
     for (const match of translationStringMatches) {
