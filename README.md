@@ -4,7 +4,7 @@ A next-gen internationalization (i18n) library for React with minimal configurat
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/circleci/FMBebRNnfb6DvNimhnN8hn/B12wdgBr28egU2dW897acs/tree/master.svg?style=svg&circle-token=CCIPRJ_Uj9rEgMxqL9qmCdG9NBRHu_70f14e002a2479d29d163bea1e256d08f5eee7cb)](https://dl.circleci.com/status-badge/redirect/circleci/FMBebRNnfb6DvNimhnN8hn/B12wdgBr28egU2dW897acs/tree/master)
 ![License](https://img.shields.io/badge/License-MIT-orange)
-![Size](https://img.shields.io/badge/Unpacked_Size-30kB-blue)
+![Size](https://img.shields.io/badge/Unpacked_Size-30.8kB-blue)
 [![Static Badge](https://img.shields.io/badge/Buy_Me_A_Coffee-yellow?style=flat&logo=buymeacoffee&labelColor=orange&color=orange)](https://www.buymeacoffee.com/kwameopareasiedu)
 
 ## Installation
@@ -158,7 +158,9 @@ _Actually, this is all you need to do even for a production app_
 
 1. Install using `yarn add --dev react-dialect` or `npm i -D react-dialect`
 
-2. Create a `dialect.config.json` file in the root of your project
+2. Initialize react-dialect using `npx react-dialect init`
+   
+   This creates a `dialect.config.json` file in the root of your project
    ```json5
    {
      content: ["src"], // Root paths of source files (.js, .ts, .jsx, .tsx)
@@ -236,5 +238,7 @@ Your support would mean so much and keep the motivation going. Thanks 🤗
 
 ## Changelog
 
+- `0.5.0`
+  - Added `init` CLI command which creates the `dialect.config.json`
 - `0.4.0`
   - Added shebang header to CLI for use with `npx`

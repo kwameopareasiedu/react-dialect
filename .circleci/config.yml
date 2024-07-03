@@ -19,11 +19,22 @@ jobs:
             equal: ["publish", <<pipeline.git.branch>>]
           steps:
             - run:
-                name: Set NPM auth token
-                command: npm set //registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN
+                name: Build landing page
+                command: |
+                  cd landing
+                  yarn install
+                  yarn build
             - run:
-                name: Publish to NPM
-                command: npm publish
+                name: Deploy landing page to Firebase
+                command: |
+                  cd landing 
+                  echo $FIREBASE_HOSTING_KEY_JSON>credentials.json
+                  GOOGLE_APPLICATION_CREDENTIALS=credentials.json npx firebase deploy
+            - run:
+                name: Publish package to NPM
+                command: |
+                  npm set //registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN
+                  npm publish
 workflows:
   build-test-publish:
     jobs:
