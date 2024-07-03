@@ -23,7 +23,7 @@ jobs:
                 command: npm set //registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN
             - run:
                 name: Publish to NPM
-                command: npm publish --dry-run
+                command: npm publish
 workflows:
   build-test-publish:
     jobs:
