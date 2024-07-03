@@ -31,7 +31,7 @@ jobs:
             GOOGLE_APPLICATION_CREDENTIALS=credentials.json
       - run:
           name: Deploy to Firebase
-          command: cd landing && firebase deploy
+          command: cd landing && npx firebase deploy
 workflows:
   build-test-publish:
     jobs:
