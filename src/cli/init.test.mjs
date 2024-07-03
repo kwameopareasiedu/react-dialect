@@ -13,7 +13,7 @@ function resolveProjectPath(segment) {
   return path.resolve(PROJECT_ROOT, segment);
 }
 
-test.before(() => {
+test.beforeEach(() => {
   if (fs.existsSync(PROJECT_ROOT)) {
     fs.rmSync(PROJECT_ROOT, { recursive: true });
   }
@@ -21,7 +21,7 @@ test.before(() => {
   fs.mkdirSync(PROJECT_ROOT, { recursive: true });
 });
 
-test.after.always(() => {
+test.afterEach.always(() => {
   if (fs.existsSync(PROJECT_ROOT)) {
     fs.rmSync(PROJECT_ROOT, { recursive: true });
   }
